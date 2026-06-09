@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>OAuth 2.0 Attestation Based Authorization for Native Applications</title>
+<meta content="Efe Kahraman" name="author">
+<meta content="
+       This document defines an extension to OAuth 2.0   that enables Authorization Servers to consider Attestation Results presented by Native Applications when issuing access grants. By incorporating information about the security characteristics of the application and its execution environment, this mechanism supports Authorization Policies that are tailored to the trustworthiness of the Native Application. 
+    " name="description">
+<meta content="xml2rfc 3.33.0" name="generator">
+<meta content="oauth" name="keyword">
+<meta content="attestation" name="keyword">
+<meta content="authorization" name="keyword">
+<meta content="draft-ekahraman-oauth-attestation-authz-native-apps-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.33.0
+    Python 3.12.13
+    ConfigArgParse 1.7
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.0.2
+    platformdirs 4.9.6
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.7.0
+-->
+<link href="draft-ekahraman-oauth-attestation-authz-native-app.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
+}
+svg {
+  display: block;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
+}
+.alignCenter {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+      float: none;
+    }
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a {
+  text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
+}
+.iref + a[href].internal {
+  color: var(--text-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
+  }
+  @media print {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+  & .prepared {
+    float: right;
+  }
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
+  }
+}
+
+/* Comments */
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
+      }
+    }
+    & a.toplink {
+      float: right;
+    }
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
+    }
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc {
+    page-break-before: always;
+    border-top: none;
+    padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">Attested Authorization for Native Apps</td>
+<td class="right">June 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Kahraman</td>
+<td class="center">Expires 11 December 2026</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Individual Submission</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-ekahraman-oauth-attestation-authz-native-apps-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-06-09" class="published">9 June 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2026-12-11">11 December 2026</time></dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">E. Kahraman</div>
+<div class="org">Mekarge</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">OAuth 2.0 Attestation Based Authorization for Native Applications</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document defines an extension to OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> that enables Authorization Servers to consider Attestation Results presented by Native Applications when issuing access grants. By incorporating information about the security characteristics of the application and its execution environment, this mechanism supports Authorization Policies that are tailored to the trustworthiness of the Native Application.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        The latest revision of this draft can be found at <span><a href="https://mekarge.github.io/draft-ekahraman-oauth-attestation-authz-native-apps/">https://mekarge.github.io/draft-ekahraman-oauth-attestation-authz-native-apps/</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-ekahraman-oauth-attestation-authz-native-apps/">https://datatracker.ietf.org/doc/draft-ekahraman-oauth-attestation-authz-native-apps/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        hello Group mailing list (<span><a href="mailto:hello@mekarge.com">mailto:hello@mekarge.com</a></span>).<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/mekarge/draft-ekahraman-oauth-attestation-authz-native-apps">https://github.com/mekarge/draft-ekahraman-oauth-attestation-authz-native-apps</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 11 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-related-works" class="internal xref">Related Works</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-evidence-collection" class="internal xref">Evidence Collection</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-evidence-verification" class="internal xref">Evidence Verification</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-attestation-result-requirem" class="internal xref">Attestation Result Requirements</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-authorization-server-proces" class="internal xref">Authorization Server Processing</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-refresh-tokens" class="internal xref">Refresh Tokens</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-protocol-extensions" class="internal xref">Protocol Extensions</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-public-client-consideration" class="internal xref">Public Client Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-relationship-with-proof-of-" class="internal xref">Relationship with Proof of Possession</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-backend-for-frontend-patter" class="internal xref">Backend-For-Frontend Pattern</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-communication-security" class="internal xref">Communication Security</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-implementation-status" class="internal xref">Implementation Status</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-mekarge-a3" class="internal xref">Mekarge A3</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
+                <p id="section-toc.1-1.12.2.1.1"><a href="#section-12.1" class="auto internal xref">12.1</a>.  <a href="#name-replay-attacks" class="internal xref">Replay Attacks</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2">
+                <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="auto internal xref">12.2</a>.  <a href="#name-challenge-freshness" class="internal xref">Challenge Freshness</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3">
+                <p id="section-toc.1-1.12.2.3.1"><a href="#section-12.3" class="auto internal xref">12.3</a>.  <a href="#name-downgrade-attacks" class="internal xref">Downgrade Attacks</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.4">
+                <p id="section-toc.1-1.12.2.4.1"><a href="#section-12.4" class="auto internal xref">12.4</a>.  <a href="#name-verifier-compromise" class="internal xref">Verifier Compromise</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.5">
+                <p id="section-toc.1-1.12.2.5.1"><a href="#section-12.5" class="auto internal xref">12.5</a>.  <a href="#name-device-key-extraction" class="internal xref">Device Key Extraction</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
+                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-evidence-exposure" class="internal xref">Evidence Exposure</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2">
+                <p id="section-toc.1-1.13.2.2.1"><a href="#section-13.2" class="auto internal xref">13.2</a>.  <a href="#name-attestation-result-exposure" class="internal xref">Attestation Result Exposure</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.3">
+                <p id="section-toc.1-1.13.2.3.1"><a href="#section-13.3" class="auto internal xref">13.3</a>.  <a href="#name-secondary-use" class="internal xref">Secondary Use</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#section-14" class="auto internal xref">14</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1">
+                <p id="section-toc.1-1.14.2.1.1"><a href="#section-14.1" class="auto internal xref">14.1</a>.  <a href="#name-oauth-parameters-registrati" class="internal xref">OAuth Parameters Registration</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
+            <p id="section-toc.1-1.15.1"><a href="#section-15" class="auto internal xref">15</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.1">
+                <p id="section-toc.1-1.15.2.1.1"><a href="#section-15.1" class="auto internal xref">15.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.2">
+                <p id="section-toc.1-1.15.2.2.1"><a href="#section-15.2" class="auto internal xref">15.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
+            <p id="section-toc.1-1.16.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">This document defines an extension to OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> that enables Authorization Servers to consider Attestation Results presented by Native Applications when issuing access grants. By incorporating information about the security characteristics of the application and its execution environment, this mechanism supports Authorization Policies that are tailored to the trustworthiness of the Native Application.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Consider a scenario where a Native Application is authorized to perform sensitive operations on behalf of a user, such as accessing financial information or initiating transactions. The application may execute on a device that has been modified or is running software capable of monitoring, intercepting, or influencing the application's execution environment. In such cases, information processed by the application or exchanged with remote services may be modified or misused by unauthorized parties. Consequently, authorization decisions based solely on the identity of the user may not accurately reflect the security posture of the requesting environment.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">The Zero Trust Architecture <span>[<a href="#ZTA" class="cite xref">ZTA</a>]</span> suggests that access to a protected resource should be granted by a policy which is evaluated on multiple attributes of the subject. In this regard, granting access to a resource may be determined by a set of attributes including device characteristics and software metadata. This leads to a need for a policy decision algorithm consuming vectors of attributes.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">Thinking of Remote Attestation Procedures (RATS) Architecture <span>[<a href="#RFC9334" class="cite xref">RFC9334</a>]</span> through the lens of Zero Trust Architecture brings a perspective to further break down the abstract concept of policy decision. It is then possible to conceptualize the subject as Attester which is the device being evaluated. And the Policy Decision Point can be mapped to the Relying Party. This mapping allows reuse of existing standardized roles and flows defined in RATS to design the policy decision functionality.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> is an effective way to ground these abstract concepts into operational implementation. The combination of the Native Application, user's device, and relevant Attesting Environments may collectively act as the Attester. The Authorization Server on the other hand relates to the concept of Relying Party.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">This document defines a mechanism to pass the Attestation Result, signed by the Verifier, to the Authorization Server during token exchange for Native Application Clients. Access tokens are issued only with the scopes permitted by Authorization Decisions derived from the Attestation Result. The flow specified in this document relates to the "Passport Model" in RATS as the Attestation Result is transported to the Authorization Server without requiring direct communication between the Authorization Server and Verifier.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<div class="alignLeft art-ascii-art art-text artwork" id="section-1-7">
+<pre>
++---------------+               (A)   +---------------+
+|               +--------------------&gt;|               |
+|    Client     |               (B)   |   Verifier    |
+|               |&lt;--------------------+               |
++-----------+---+                     +---------------+
+    ^       |
+    |       |
+    |       |                         +---------------+
+    |       |                   (C)   |               |
+    |       +------------------------&gt;| Authorization |
+    |                           (D)   |     Server    |
+    +---------------------------------+               |
+                                      +---------------+
+</pre><a href="#section-1-7" class="pilcrow">¶</a>
+</div>
+<p id="section-1-8">This flow includes the following steps:<a href="#section-1-8" class="pilcrow">¶</a></p>
+<p id="section-1-9">(A) Client sends all collected Evidence to the Verifier. Client <span class="bcp14">MAY</span> sign the request with an asymmetric cryptographic key. If client signs the request, it's <span class="bcp14">RECOMMENDED</span> to send the public JWK in the request body. It's <span class="bcp14">RECOMMENDED</span> to use HTTP Message Signatures <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> for the signing implementation and HTTPS as the underlying protocol. The message structure is beyond the scope of this document.<a href="#section-1-9" class="pilcrow">¶</a></p>
+<p id="section-1-10">(B) Verifier creates an Attestation Result based on the Evidence. Verifier <span class="bcp14">MUST</span> sign the Attestation Result with a cryptographic key. For asymmetric keys, Verifier <span class="bcp14">MUST</span> share the public key with Authorization Server. For both asymmetric and symmetric keys, key establishment protocol is beyond the scope of this document. Verifier <span class="bcp14">MUST</span> make the response uncacheable by adding a <code>Cache-Control</code> header set as <code>no-store</code>.<a href="#section-1-10" class="pilcrow">¶</a></p>
+<p id="section-1-11">(C) Client sends the token request to Authorization Server with additional parameters including the Attestation Result. This document defines necessary extensions in <a href="#ext" class="auto internal xref">Section 8</a>.<a href="#section-1-11" class="pilcrow">¶</a></p>
+<p id="section-1-12">(D) The Authorization Server gathers Authorization Policies for each requested scope. For each Authorization Policy, Authorization Server obtains Trust Decisions by evaluating the corresponding Trust Assessment. Trust Assesments are predicates using the Attestation Result provided by the client. After each Authorization Policy is evaluated, Authorization Server determines scopes based on Authorization Decisions and issues the access token accordingly.<a href="#section-1-12" class="pilcrow">¶</a></p>
+<p id="section-1-13">Client <span class="bcp14">MAY</span> cache the Attestation Result received from the Verifier for different token requests. In this case, client <span class="bcp14">SHOULD</span> cache the Attestation Result with a short expiry time. Authorization Server <span class="bcp14">MAY</span> reject the token request if the freshness of the Attestation Result doesn't meet system requirements.<a href="#section-1-13" class="pilcrow">¶</a></p>
+<p id="section-1-14">This document does not standardize Evidence collection, Verifier interfaces, or Attestation Result formats. It defines only how an Authorization Server consumes Attestation Results during authorization.<a href="#section-1-14" class="pilcrow">¶</a></p>
+<div id="related-works">
+<section id="section-1.1">
+        <h3 id="name-related-works">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-related-works" class="section-name selfRef">Related Works</a>
+        </h3>
+<p id="section-1.1-1">A related approach is proposed in <span>[<a href="#I-D.ietf-oauth-attestation-based-client-auth" class="cite xref">I-D.ietf-oauth-attestation-based-client-auth</a>]</span>, which addresses a mechanism for proving client instance identity and handling authentication. This document addresses the distinct problem of authorization based on attestation.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="conventions-and-definitions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="terminology">
+<section id="section-3">
+      <h2 id="name-terminology">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+      </h2>
+<p id="section-3-1">The reader is assumed to be familiar with the vocabulary and concepts defined in OAuth 2.0.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">The following term is imported from <span>[<a href="#ZTA" class="cite xref">ZTA</a>]</span>:<a href="#section-3-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3-3.1">
+          <p id="section-3-3.1.1">Policy Decision Point<a href="#section-3-3.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-4">The following terms are imported from <span><a href="https://rfc-editor.org/rfc/rfc9334#section-4" class="relref">Section 4</a> of [<a href="#RFC9334" class="cite xref">RFC9334</a>]</span>:<a href="#section-3-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3-5.1">
+          <p id="section-3-5.1.1">Attesting Environment<a href="#section-3-5.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-5.2">
+          <p id="section-3-5.2.1">Appraisal Policy for Attestation Result (APR)<a href="#section-3-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-5.3">
+          <p id="section-3-5.3.1">Attestation Result<a href="#section-3-5.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-5.4">
+          <p id="section-3-5.4.1">Attester<a href="#section-3-5.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-5.5">
+          <p id="section-3-5.5.1">Evidence<a href="#section-3-5.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-5.6">
+          <p id="section-3-5.6.1">Relying Party<a href="#section-3-5.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-5.7">
+          <p id="section-3-5.7.1">Verifier<a href="#section-3-5.7.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-6">The abbreviation APR is used throughout this document.<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-3-7">This document additionally defines the following terms:<a href="#section-3-7" class="pilcrow">¶</a></p>
+<p id="section-3-8">Native Application (Native App)<a href="#section-3-8" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-3-9.1">
+          <p id="section-3-9.1.1">An application that is installed by the user to their device. Different from the "native app" definition in <span><a href="https://rfc-editor.org/rfc/rfc8252#section-3" class="relref">Section 3</a> of [<a href="#RFC8252" class="cite xref">RFC8252</a>]</span>, Native Application is expected to provide device attributes and application metadata.<a href="#section-3-9.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-10">Native Application Client<a href="#section-3-10" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-3-11.1">
+          <p id="section-3-11.1.1">The OAuth 2.0 client requesting access token for the Native Application. Client can be a part of the Native Application acting as a Public client, or can be part of a backend service requesting access token on behalf of the Native Application as a part of the Backend-For-Frontend pattern. Throughout this document, Native Application Client will be referred to as "client".<a href="#section-3-11.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-12">Challenge<a href="#section-3-12" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-3-13.1">
+          <p id="section-3-13.1.1">A cryptographically random nonce which is generated and validated by the Verifier.<a href="#section-3-13.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-14">Appraisal Assertion<a href="#section-3-14" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-3-15.1">
+          <p id="section-3-15.1.1">Represents the outcome of evaluating a distinct aspect of the Attester. Each Appraisal Assertion <span class="bcp14">MAY</span> have its own status and associated claims. An Attestation Result <span class="bcp14">MUST</span> contain one or more Appraisal Assertions.<a href="#section-3-15.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-16">Trust Assessment<a href="#section-3-16" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-3-17.1">
+          <p id="section-3-17.1.1">Evaluation of an Attestation Result according to an APR. APR <span class="bcp14">MAY</span> have separate rule for each Appraisal Assertion forming the Attestation Result.<a href="#section-3-17.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-18">Trust Decision<a href="#section-3-18" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-3-19.1">
+          <p id="section-3-19.1.1">The outcome of a Trust Assessment. It is either "Allow" or "Deny".<a href="#section-3-19.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-20">Authorization Policy<a href="#section-3-20" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-3-21.1">
+          <p id="section-3-21.1.1">Specification of Trust Assessments required for a scope. Specification <span class="bcp14">MAY</span> require at least one of or all Trust Decisions to result in "Allow".<a href="#section-3-21.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-22">Authorization Decision<a href="#section-3-22" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-3-23.1">
+          <p id="section-3-23.1.1">Indicates if a particular scope is granted to a client after the evaluation of the associated Authorization Policy.<a href="#section-3-23.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+</section>
+</div>
+<div id="egen">
+<section id="section-4">
+      <h2 id="name-evidence-collection">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-evidence-collection" class="section-name selfRef">Evidence Collection</a>
+      </h2>
+<p id="section-4-1">Native Applications collect Evidence for the Verifier. Verifier <span class="bcp14">SHOULD</span> provide a Challenge value to test the freshness of the Evidence. When provided, Native Application <span class="bcp14">MUST</span> use the Challenge value when collecting Evidence. Verifier <span class="bcp14">SHOULD</span> generate a Challenge value with sufficient entropy according to the system requirements.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">How Native Application fetches the Challenge is beyond the scope of this document. Verifier <span class="bcp14">MAY</span> offer an endpoint as shown below.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-ascii-art art-text artwork" id="section-4-3">
+<pre>
++---------------+               (A)   +---------------+
+|               +--------------------&gt;|               |
+|  Native App   |               (B)   |   Verifier    |
+|               |&lt;--------------------+               |
++---------------+                     +---------------+
+</pre><a href="#section-4-3" class="pilcrow">¶</a>
+</div>
+<p id="section-4-4">This flow includes the following steps:<a href="#section-4-4" class="pilcrow">¶</a></p>
+<p id="section-4-5">(A) Native Application requests a Challenge value from Verifier. Native Application <span class="bcp14">MAY</span> sign the request by generating an asymmetric key pair in a secure enclave on the device or use a previously generated key pair. If request is signed, Native Application <span class="bcp14">MUST</span> send the public key JWK to the Verifier. It's <span class="bcp14">RECOMMENDED</span> to use HTTP Message Signatures <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> for the signing implementation and HTTPS as the underlying protocol.<a href="#section-4-5" class="pilcrow">¶</a></p>
+<p id="section-4-6">(B) Verifier generates a fresh Challenge with sufficient entropy. If request is signed and Verifier receives public JWK from Native Application, it <span class="bcp14">MUST</span> bind the generated Challenge value to the public key JWK or to a stable identifier derived from that key, such as a JWK Thumbprint (<span>[<a href="#RFC7638" class="cite xref">RFC7638</a>]</span>). Verifier <span class="bcp14">MUST</span> store the Challenge creation timestamp for the freshness check. Verifier <span class="bcp14">MUST</span> make the response uncacheable by adding a <code>Cache-Control</code> header set as <code>no-store</code>.<a href="#section-4-6" class="pilcrow">¶</a></p>
+<p id="section-4-7">Native Application <span class="bcp14">MAY</span> contact with other parties when collecting the Evidence. In terms of RATS architecture, Evidence is created by Attesting Environments. The Attesting Environment can be a remote service provided by a vendor or platform. Message exchange is shown below.<a href="#section-4-7" class="pilcrow">¶</a></p>
+<div class="alignLeft art-ascii-art art-text artwork" id="section-4-8">
+<pre>
++---------------+               (A)   +---------------+
+|               +--------------------&gt;|               |
+|  Native App   |               (B)   |   Attesting   |
+|               |&lt;--------------------+  Environment  |
+|               |                     |               |
++---------------+                     +---------------+
+</pre><a href="#section-4-8" class="pilcrow">¶</a>
+</div>
+<p id="section-4-9">This flow includes the following steps:<a href="#section-4-9" class="pilcrow">¶</a></p>
+<p id="section-4-10">(A) Native Application sends a request to Attesting Environment to get Evidence by providing necessary claims. Native Application <span class="bcp14">SHOULD</span> present the Challenge value supplied from Verifier in addition to the claims. The message structure is specific to the Attesting Environment and is beyond the scope of this document.<a href="#section-4-10" class="pilcrow">¶</a></p>
+<p id="section-4-11">(B) Attesting Environment generates the Evidence. Attesting Environment <span class="bcp14">MUST</span> embed the Challenge value in Evidence when Challenge is present. Attesting Environment <span class="bcp14">SHOULD</span> sign the Evidence with a cryptographic key.<a href="#section-4-11" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="ever">
+<section id="section-5">
+      <h2 id="name-evidence-verification">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-evidence-verification" class="section-name selfRef">Evidence Verification</a>
+      </h2>
+<p id="section-5-1">Verifier creates the Attestation Result based on the Evidence sent by the client. Verifier <span class="bcp14">MAY</span> test the integrity and the authenticity of the Evidence using Attesting Environment as shown below.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-ascii-art art-text artwork" id="section-5-2">
+<pre>
++---------------+               (A)   +---------------+
+|               +--------------------&gt;|               |
+|    Client     |               (D)   |    Verifier   |
+|               |&lt;--------------------+               |
++---------------+                     +-----------+---+
+                                          ^       |
+                                          |       |
+                                     (C)  |       | (B)
+                                          |       v
+                                      +---+-----------+
+                                      |               |
+                                      |  Attesting    |
+                                      |  Environment  |
+                                      |               |
+                                      +---------------+
+</pre><a href="#section-5-2" class="pilcrow">¶</a>
+</div>
+<p id="section-5-3">This flow includes the following steps:<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4">(A) Client sends Evidence to the Verifier. Evidence <span class="bcp14">MUST</span> include the Challenge value if Verifier has provided one during Evidence generation as described in <a href="#egen" class="auto internal xref">Section 4</a>. When the Challenge value is used, client <span class="bcp14">MUST</span> send the public key JWK of the Native Application.<a href="#section-5-4" class="pilcrow">¶</a></p>
+<p id="section-5-5">(B) If the Evidence is cryptographically signed, Verifier <span class="bcp14">MUST</span> validate the signature. The key establishment protocol for the cryptographic key between Verifier and Attesting Environment is beyond the scope of this document. Verifier calls the Attesting Environment for further checking the integrity and decoding the Evidence if necessary.<a href="#section-5-5" class="pilcrow">¶</a></p>
+<p id="section-5-6">(C) Attesting Environment <span class="bcp14">MAY</span> run integrity checks on the Evidence and return the Evidence with claims useful for the Verifier. Attesting Environment <span class="bcp14">MUST</span> extract the Challenge from Evidence and return its value explicitly if it was supplied by the Native Application.<a href="#section-5-6" class="pilcrow">¶</a></p>
+<p id="section-5-7">(D) Verifier processes the information returned from Attesting Environment. Verifier <span class="bcp14">MUST</span> test the Challenge value if it is returned from the Attesting Environment. Verifier <span class="bcp14">MAY</span> implement a lookup table to find the associated Challenge value via the public key JWK or to a stable identifier derived from that key, such as a JWK Thumbprint (<span>[<a href="#RFC7638" class="cite xref">RFC7638</a>]</span>) which is received in the request (A). It's <span class="bcp14">RECOMMENDED</span> for Verifier to check the freshness of the Evidence when Challenge creation timestamp is known. Based on the validations, Verifier creates the Attestation Result.<a href="#section-5-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="attestation-result-requirements">
+<section id="section-6">
+      <h2 id="name-attestation-result-requirem">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-attestation-result-requirem" class="section-name selfRef">Attestation Result Requirements</a>
+      </h2>
+<p id="section-6-1">Attestation Result <span class="bcp14">MUST</span> be signed by the Verifier with a cryptographic key.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">The structure of the Attestation Result is out of scope of this document. However, it is <span class="bcp14">RECOMMENDED</span> to include the elements defined by the <span>[<a href="#I-D.ietf-rats-ar4si" class="cite xref">I-D.ietf-rats-ar4si</a>]</span>. Following information is <span class="bcp14">REQUIRED</span> for Attestation Result:<a href="#section-6-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6-3.1">
+          <p id="section-6-3.1.1">One or more Appraisal Assertions where each Appraisal Assertion corresponding to a distinct aspect of the device or Native Application. Each Appraisal Assertion <span class="bcp14">MAY</span> have its own status and associated claims. Those claims can be implemented as the Trustworthiness Claims defined in <span>[<a href="#I-D.ietf-rats-ar4si" class="cite xref">I-D.ietf-rats-ar4si</a>]</span>.<a href="#section-6-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-6-3.2">
+          <p id="section-6-3.2.1">Identity of the Verifier issuing the Attestation Result. This identity can be implemented as the Verifier ID defined in <span>[<a href="#I-D.ietf-rats-ar4si" class="cite xref">I-D.ietf-rats-ar4si</a>]</span>.<a href="#section-6-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-6-3.3">
+          <p id="section-6-3.3.1">Intended Authorization Server. This value <span class="bcp14">SHOULD</span> be the issuer URI used by the Authorization Server.<a href="#section-6-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-6-3.4">
+          <p id="section-6-3.4.1">A timestamp value indicating when the Attestation Result is created.<a href="#section-6-3.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-6-4">The encoding of the Attestation Result is beyond the scope of this document. However implementer <span class="bcp14">MAY</span> choose EAR Tokens as defined in EAT Attestation Results <span>[<a href="#I-D.ietf-rats-ear" class="cite xref">I-D.ietf-rats-ear</a>]</span>. Verifier <span class="bcp14">MUST</span> use the Attestation Result format and encoding supported by the Authorization Server.<a href="#section-6-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authorization-server-processing">
+<section id="section-7">
+      <h2 id="name-authorization-server-proces">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-authorization-server-proces" class="section-name selfRef">Authorization Server Processing</a>
+      </h2>
+<p id="section-7-1">The Authorization Server <span class="bcp14">MUST</span> validate the Attestation Result's signature. Authorization Server <span class="bcp14">MUST</span> accept Attestation Result only from trusted Verifiers.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">Only successfully validated Attestation Result is used when evaluating an Authorization Policy. Authorization Server, depending on the Authorization Decisions, <span class="bcp14">MUST</span> decide which scopes should be issued in access token.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">Upon receiving the Attestation Result, Authorization Server <span class="bcp14">MUST</span> perform the following steps:<a href="#section-7-3" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-7-4">
+<li id="section-7-4.1">
+          <p id="section-7-4.1.1">Checks if the cryptographic signature of the Attestation Result is valid. The key establishment protocol for the cryptographic key between Verifier and Authorization Server is beyond the scope of this document.<a href="#section-7-4.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-7-4.2">
+          <p id="section-7-4.2.1">Checks the freshness of the Attestation Result using the creation timestamp.<a href="#section-7-4.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-7-4.3">
+          <p id="section-7-4.3.1">Checks if Verifier ID is present and is trusted by the system.<a href="#section-7-4.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-7-4.4">
+          <p id="section-7-4.4.1">Checks if the intended Authorization Server points to the server itself.<a href="#section-7-4.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-7-4.5">
+          <p id="section-7-4.5.1">Checks if Attestation Result contains all necessary Appraisal Assertions required by the Trust Assessments.<a href="#section-7-4.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-7-4.6">
+          <p id="section-7-4.6.1">For each scope available to the client, Authorization Server evaluates the Authorization Policy, which is the specification of the Trust Assessments. How Authorization Policy is defined and associated to the scope is beyond the scope of this document.<a href="#section-7-4.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-7-4.7">
+          <p id="section-7-4.7.1">Based on the Authorization Decision for each scope, Authorization Server adds or removes the particular scope from the access token. Authorization Server <span class="bcp14">MAY</span> issue a token containing a reduced set of scopes, or <span class="bcp14">MAY</span> reject the request entirely. If no scopes are allowed, Authorization Server <span class="bcp14">SHOULD</span> return the <code>invalid_scope</code> error as defined in <span><a href="https://rfc-editor.org/rfc/rfc6749#section-5.2" class="relref">Section 5.2</a> of [<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>. If token is issued with a reduced set of scopes, the Authorization Server <span class="bcp14">SHOULD</span> return the <code>scope</code> parameter in the token response.<a href="#section-7-4.7.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+<p id="section-7-5">When access token issued successfully, Authorization Server <span class="bcp14">MUST</span> bind the Verifier ID to that access token and refresh token if requested by Client.<a href="#section-7-5" class="pilcrow">¶</a></p>
+<div id="refresh-tokens">
+<section id="section-7.1">
+        <h3 id="name-refresh-tokens">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-refresh-tokens" class="section-name selfRef">Refresh Tokens</a>
+        </h3>
+<p id="section-7.1-1">The Client <span class="bcp14">MUST</span> send an Attestation Result to the Authorization Server when using a refresh token grant according to the freshness window required by the Authorization Server. Because Attestation Results are snapshots of Native Application's runtime state at a single point in time, the Authorization Server <span class="bcp14">MUST</span> reject the request if Attestation Result is missing or stale.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="ext">
+<section id="section-8">
+      <h2 id="name-protocol-extensions">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-protocol-extensions" class="section-name selfRef">Protocol Extensions</a>
+      </h2>
+<p id="section-8-1">This specification adds two parameters to the Token Endpoint request for <code>authorization_code</code> and <code>refresh_token</code> grant types:<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-2"><code>attestation_result</code><a href="#section-8-2" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-8-3.1">
+          <p id="section-8-3.1.1"><span class="bcp14">REQUIRED</span>. Contains the Attestation Result generated by the Verifier. The structure of the Attestation Result is beyond the scope of this document. However implementer <span class="bcp14">MAY</span> choose EAR Tokens as defined in EAT Attestation Results <span>[<a href="#I-D.ietf-rats-ear" class="cite xref">I-D.ietf-rats-ear</a>]</span>.<a href="#section-8-3.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-8-4"><code>attestation_profile</code><a href="#section-8-4" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-8-5.1">
+          <p id="section-8-5.1.1"><span class="bcp14">OPTIONAL</span>. References to the Authorization Policy which will evaluate the Attestation Result. Implementer may choose to mark this parameter as <span class="bcp14">REQUIRED</span> when Authorization Server supports definition of multiple Authorization Policies.<a href="#section-8-5.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-8-6">The following example uses "\" line wrapping per <span>[<a href="#RFC8792" class="cite xref">RFC8792</a>]</span> to show a token request. In this example Attestation Result is encoded in JWT as defined in <span>[<a href="#I-D.ietf-rats-ear" class="cite xref">I-D.ietf-rats-ear</a>]</span>.<a href="#section-8-6" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-8-7">
+<pre>
+POST /token HTTP/1.1
+     Host: server.example.com
+     Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+     Content-Type: application/x-www-form-urlencoded
+     grant_type=authorization_code\
+     &amp;code=SplxlOBeZQQYbYS6WxSbIA \
+     &amp;redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb \
+     &amp;attestation_profile=android \
+     &amp;attestation_result=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlYXRfcHJvZmlsZSI6InRhZzpnaXRodWIuY29tLDIwMjM6dmVyYWlzb24vZWFyIiwiaWF0IjoxNjY2NTI5MzAwLCJlYXIudmVyaWZpZXItaWQiOnsiZGV2ZWxvcGVyIjoiaHR0cHM6Ly92ZXJpZmllci1zZXJ2aWNlIiwiYnVpbGQiOiIwLjAuMSJ9LCJzdWJtb2RzIjp7InBsYXktaW50ZWdyaXR5Ijp7ImVhci5zdGF0dXMiOiJhZmZpcm1pbmciLCJlYXIudHJ1c3R3b3J0aGluZXNzLXZlY3RvciI6eyJyZXF1ZXN0X3BhY2thZ2VfbmFtZSI6Mn19fX0.vSXHlSZokqGPxORoMrKY5Y-0Ge2kVdDKTnyugWD2lkk
+</pre><a href="#section-8-7" class="pilcrow">¶</a>
+</div>
+<p id="section-8-8">These parameters are primarily intended for the Token Endpoint, unless the front-channel pre-flight optimizations described in <a href="#pub" class="auto internal xref">Section 9</a> are utilized.<a href="#section-8-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="pub">
+<section id="section-9">
+      <h2 id="name-public-client-consideration">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-public-client-consideration" class="section-name selfRef">Public Client Considerations</a>
+      </h2>
+<p id="section-9-1">In this section client is a Public client and is part of the Native Application.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-2">Authorization Server <span class="bcp14">MAY</span> precheck Attestation Result in early stages of the authorization flow in order to avoid unnecessary steps in case Attestation Result is invalid or doesn't meet requirements of target Trust Assesments. In this case, the parameters defined in <a href="#ext" class="auto internal xref">Section 8</a> can be used in the authorization request. However, the Attestation Result can contain some sensitive data that should not be transferred through the front-channel. The following approaches can be used:<a href="#section-9-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9-3.1">
+          <p id="section-9-3.1.1">Verifier can cryptographically encrypt the Attestation Result. Contents of the Attestation Result will remain hidden all the way through the Authorization Server. But this option can lead to long URLs, which can be problematic due to size limitations that can be enforced from any intermediary hop.<a href="#section-9-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-9-3.2">
+          <p id="section-9-3.2.1">Client can use Pushed Authorization Requests <span>[<a href="#RFC9126" class="cite xref">RFC9126</a>]</span> to send the Attestation Token through the back-channel.<a href="#section-9-3.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-9-4">When Attestation Result is received in authorization request, Authorization Server <span class="bcp14">MUST</span> perform the following steps:<a href="#section-9-4" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-9-5">
+<li id="section-9-5.1">
+          <p id="section-9-5.1.1">Checks if the cryptographic signature of the Attestation Result is valid. The key establishment protocol for the cryptographic key between Verifier and Authorization Server is beyond the scope of this document.<a href="#section-9-5.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-5.2">
+          <p id="section-9-5.2.1">Checks the freshness of the Attestation Result using the creation timestamp.<a href="#section-9-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-5.3">
+          <p id="section-9-5.3.1">Checks if Verifier ID is present and is trusted by the system.<a href="#section-9-5.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-5.4">
+          <p id="section-9-5.4.1">Checks if the intended Authorization Server points to the server itself.<a href="#section-9-5.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-5.5">
+          <p id="section-9-5.5.1">Checks if Attestation Result contains all necessary Appraisal Assertions required by the Trust Assessments.<a href="#section-9-5.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-5.6">
+          <p id="section-9-5.6.1">Stores the Attestation Result for the Authorization Policy evaluation during the upcoming token request. Authorization Server <span class="bcp14">SHOULD</span> store the Attestation Result with an expiry time not longer than the combination of authorization code and request URI lifetimes.<a href="#section-9-5.6.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+<p id="section-9-6">If one of those steps fails, Authorization Server <span class="bcp14">MUST</span> respond with an error. The error <span class="bcp14">SHOULD</span> indicate <code>access_denied</code> as defined in <span><a href="https://rfc-editor.org/rfc/rfc6749#section-4.1.2.1" class="relref">Section 4.1.2.1</a> of [<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-9-6" class="pilcrow">¶</a></p>
+<p id="section-9-7">Authorization Server <span class="bcp14">MUST</span> respond with an error if it receives Attestation Result in both authorization request and token requests. The error <span class="bcp14">SHOULD</span> indicate <code>invalid_request</code> as defined in <span><a href="https://rfc-editor.org/rfc/rfc6749#section-5.2" class="relref">Section 5.2</a> of [<a href="#RFC6749" class="cite xref">RFC6749</a>]</span><a href="#section-9-7" class="pilcrow">¶</a></p>
+<div id="relationship-with-proof-of-possession">
+<section id="section-9.1">
+        <h3 id="name-relationship-with-proof-of-">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-relationship-with-proof-of-" class="section-name selfRef">Relationship with Proof of Possession</a>
+        </h3>
+<p id="section-9.1-1">Native Application Client can use Proof of Possession method for the token request in the subsequent calls. OAuth 2.0 Demonstrating Proof of Possession (DPoP) <span>[<a href="#RFC9449" class="cite xref">RFC9449</a>]</span> is <span class="bcp14">RECOMMENDED</span> for sender-constraining access tokens. Proof of Possession is not a dependency but can be used as complimentary to the mechanism defined in this document.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="bff">
+<section id="section-10">
+      <h2 id="name-backend-for-frontend-patter">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-backend-for-frontend-patter" class="section-name selfRef">Backend-For-Frontend Pattern</a>
+      </h2>
+<p id="section-10-1">The proposed mechanism in this document can also be used for Native Applications connecting to a proxy backend acting as a confidential client. The Backend-For-Frontend pattern for OAuth 2.0 was introduced in OAuth 2.0 for Browser-Based Applications <span>[<a href="#I-D.ietf-oauth-browser-based-apps" class="cite xref">I-D.ietf-oauth-browser-based-apps</a>]</span>. While the Backend-for-Frontend (BFF) pattern was originally designed to solve browser-based security vulnerabilities, it can be adapted to Native Applications.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">By placing a backend layer between Native Application and Authorization Server, responsibility of sending Attestation Result will be shifted to the new layer. From this point onwards this backend layer will be called the Attestation Server.<a href="#section-10-2" class="pilcrow">¶</a></p>
+<p id="section-10-3">Attestation Server <span class="bcp14">MAY</span> embed the Verifier functionality, or use a remote Verifier for receiving the Attestation Result.<a href="#section-10-3" class="pilcrow">¶</a></p>
+<div id="communication-security">
+<section id="section-10.1">
+        <h3 id="name-communication-security">
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-communication-security" class="section-name selfRef">Communication Security</a>
+        </h3>
+<p id="section-10.1-1">This document does not enforce any particular protocol for the messaging between Attestation Server and a remote Verifier. However the implementer <span class="bcp14">MUST</span> use TLS for securing the underlying protocol.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="implementation-status">
+<section id="section-11">
+      <h2 id="name-implementation-status">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-implementation-status" class="section-name selfRef">Implementation Status</a>
+      </h2>
+<p id="section-11-1">This section records the status of known implementations of the protocol defined by this specification at the time of posting of this Internet-Draft, and is based on a proposal described in <span>[<a href="#RFC7942" class="cite xref">RFC7942</a>]</span>.  The description of implementations in this section is intended to assist the IETF in its decision processes in progressing drafts to RFCs.  Please note that the listing of any individual implementation here does not imply endorsement by the IETF.  Furthermore, no effort has been spent to verify the information presented here that was supplied by IETF contributors. This is not intended as, and must not be construed to be, a catalog of available implementations or their features.  Readers are advised to note that other implementations may exist.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-11-2">According to <span>[<a href="#RFC7942" class="cite xref">RFC7942</a>]</span>, "this will allow reviewers and working groups to assign due consideration to documents that have the benefit of running code, which may serve as evidence of valuable experimentation and feedback that have made the implemented protocols more mature.  It is up to the individual working groups to use this information as they see fit".<a href="#section-11-2" class="pilcrow">¶</a></p>
+<div id="mekarge-a3">
+<section id="section-11.1">
+        <h3 id="name-mekarge-a3">
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-mekarge-a3" class="section-name selfRef">Mekarge A3</a>
+        </h3>
+<p id="section-11.1-1">The organization responsible for this implementation is Mekarge. <span>[<a href="#MekargeA3" class="cite xref">MekargeA3</a>]</span> is an Authorization Server designed to manage authentication, authorization, and access control for applications and services. By the time of writing this document, Mekarge A3 is available for beta access.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
+<p id="section-11.1-2">Mekarge A3 implements the mechanism offered in this document with incorporating Backend-For-Frontend pattern described in <a href="#bff" class="auto internal xref">Section 10</a>. Mekarge A3 introduces the following concepts:<a href="#section-11.1-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-11.1-3.1">
+            <p id="section-11.1-3.1.1">Permission as a unique combination of a Resource and one of its scopes. Each permission defines the specific actions and data access rights that can be granted to a client.<a href="#section-11.1-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-11.1-3.2">
+            <p id="section-11.1-3.2.1">An Attestation Profile defines a set of Appraisal criteria for evaluating device and Native Application trustworthiness. Attestation Profiles are associated with the permissions. During authorization, Mekarge A3 Authorization Server evaluates all the Appraisals defined for the Attestation Profile and filters the client's granted permissions that are associated with the particular Attestation Profile.<a href="#section-11.1-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-11.1-4">Latest API documentation can be accessed via <span>[<a href="#MekargeA3.API" class="cite xref">MekargeA3.API</a>]</span>. The developers can be contacted through <a href="hello@mekarge.com">hello@mekarge.com</a>.<a href="#section-11.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-12">
+      <h2 id="name-security-considerations">
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<div id="replay-attacks">
+<section id="section-12.1">
+        <h3 id="name-replay-attacks">
+<a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-replay-attacks" class="section-name selfRef">Replay Attacks</a>
+        </h3>
+<p id="section-12.1-1">Authorization Server <span class="bcp14">MUST</span> implement measures to detect replay attacks. Authorization Server <span class="bcp14">MUST</span> check the freshness of the Attestation Result using its creation timestamp. Authorization Server <span class="bcp14">MAY</span> implement additional measures to minimize the clock skew between the source (Verifier) and itself.<a href="#section-12.1-1" class="pilcrow">¶</a></p>
+<p id="section-12.1-2">When receiving Attestation Result from public clients on token request, Authorization Server <span class="bcp14">SHOULD</span> use a short time window for checking freshness of the Attestation Result.<a href="#section-12.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="challenge-freshness">
+<section id="section-12.2">
+        <h3 id="name-challenge-freshness">
+<a href="#section-12.2" class="section-number selfRef">12.2. </a><a href="#name-challenge-freshness" class="section-name selfRef">Challenge Freshness</a>
+        </h3>
+<p id="section-12.2-1">Verifier <span class="bcp14">SHOULD</span> offer a mechanism to provide a fresh Challenge value with sufficient entropy to Native Application. Verifier <span class="bcp14">MUST</span> check both freshness and the value of the Challenge in the Evidence before generating the Attestation Result if a Challenge was provided. In order to check the freshness, Verifier can store the timestamp when Challenge value is issued. Verifier <span class="bcp14">SHOULD</span> discard the Challenge value on its first occurrence in an Evidence.<a href="#section-12.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="downgrade-attacks">
+<section id="section-12.3">
+        <h3 id="name-downgrade-attacks">
+<a href="#section-12.3" class="section-number selfRef">12.3. </a><a href="#name-downgrade-attacks" class="section-name selfRef">Downgrade Attacks</a>
+        </h3>
+<p id="section-12.3-1">Authorization Server <span class="bcp14">MUST</span> reject the token request if <code>attestation_result</code> parameter is not provided and system has an Authorization Policy defined for at least one scope requested by client.<a href="#section-12.3-1" class="pilcrow">¶</a></p>
+<p id="section-12.3-2">Authorization Server <span class="bcp14">MUST</span> reject the token request if there are multiple Authorization Policy defined for at least one scope requested by client and <code>attestation_profile</code> parameter is not provided.<a href="#section-12.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="verifier-compromise">
+<section id="section-12.4">
+        <h3 id="name-verifier-compromise">
+<a href="#section-12.4" class="section-number selfRef">12.4. </a><a href="#name-verifier-compromise" class="section-name selfRef">Verifier Compromise</a>
+        </h3>
+<p id="section-12.4-1">As aforementioned, Authorization Server <span class="bcp14">MUST</span> check if Verifier ID is present and is trusted by the system when processing the Attestation Result. In case Verifier is known to be compromised, Authorization Server <span class="bcp14">MUST</span> reject all requests with Attestation Token that are created by the compromised Verifier. Authorization Server also <span class="bcp14">MUST</span> reject any token request using refresh token grant if the original token request issuing the refresh token has used the Attestation Result created by the compromised Verifier during Authorization Policy evaluation.<a href="#section-12.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="device-key-extraction">
+<section id="section-12.5">
+        <h3 id="name-device-key-extraction">
+<a href="#section-12.5" class="section-number selfRef">12.5. </a><a href="#name-device-key-extraction" class="section-name selfRef">Device Key Extraction</a>
+        </h3>
+<p id="section-12.5-1">When client signs the Challenge request using an asymmetric key pair as described in <a href="#egen" class="auto internal xref">Section 4</a>, the security of this model relies on the device's ability to prevent key extraction. It is therefore Verifier's responsibility to assess the risk accordingly if the device executing Native Application does not support a secure enclave or a similar hardware-based storage.<a href="#section-12.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="privacy-considerations">
+<section id="section-13">
+      <h2 id="name-privacy-considerations">
+<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
+      </h2>
+<div id="evidence-exposure">
+<section id="section-13.1">
+        <h3 id="name-evidence-exposure">
+<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-evidence-exposure" class="section-name selfRef">Evidence Exposure</a>
+        </h3>
+<p id="section-13.1-1">Depending on the Attesting Environment implementation, Evidence might contain sensitive data without cryptographic encryption. In some cases, such Evidence might include Personally Identifying Information (PII) as well. Clients are therefore responsible for securely sending Evidence to the Verifier. Client <span class="bcp14">MUST</span> use TLS based protocol and ensure Verifier server certificate is valid and trustable.<a href="#section-13.1-1" class="pilcrow">¶</a></p>
+<p id="section-13.1-2">Native Application <span class="bcp14">MUST</span> avoid transmitting unnecessary device metadata to Attesting Environment. Similarly, Attesting Environment <span class="bcp14">MUST</span> only include claims required for the Verifier.<a href="#section-13.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="attestation-result-exposure">
+<section id="section-13.2">
+        <h3 id="name-attestation-result-exposure">
+<a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-attestation-result-exposure" class="section-name selfRef">Attestation Result Exposure</a>
+        </h3>
+<p id="section-13.2-1">Attestation Result might contain information about the internal state of the device, Native Application software, and the Verifier software. Depending on the nature of the Native Application the Attestation Result can include Personally Identifying Information (PII) as well. Clients are therefore responsible for taking necessary measures for ensuring Attestation Result is safely stored if caching is implemented and it is sent to Authorization Server through back-channel. For public clients, if Native Application is intended to send Attestation Result before access token request as described in <a href="#pub" class="auto internal xref">Section 9</a>, it is <span class="bcp14">RECOMMENDED</span> to use Pushed Authorization Requests <span>[<a href="#RFC9126" class="cite xref">RFC9126</a>]</span>.<a href="#section-13.2-1" class="pilcrow">¶</a></p>
+<p id="section-13.2-2">Authorization Server is responsible for how Attestation Result and associated decisions are logged for security and privacy audits. Authorization Server <span class="bcp14">SHOULD NOT</span> log Attestation Result if there is a risk of exposure of log data to unintended parties.<a href="#section-13.2-2" class="pilcrow">¶</a></p>
+<p id="section-13.2-3">Attestation Results can contain stable identifiers. By accessing logs including Attestation Results, users or devices can be correlated using those stable identifiers. It is therefore Authorization Server's responsibility to handle such identifiers, such as hashing, anonymizing, or omitting during logging.<a href="#section-13.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="secondary-use">
+<section id="section-13.3">
+        <h3 id="name-secondary-use">
+<a href="#section-13.3" class="section-number selfRef">13.3. </a><a href="#name-secondary-use" class="section-name selfRef">Secondary Use</a>
+        </h3>
+<p id="section-13.3-1">Attestation Results collected for authorization <span class="bcp14">SHOULD</span> not automatically be reused for analytics, profiling, or marketing by the Authorization Server.<a href="#section-13.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="iana-considerations">
+<section id="section-14">
+      <h2 id="name-iana-considerations">
+<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<div id="oauth-parameters-registration">
+<section id="section-14.1">
+        <h3 id="name-oauth-parameters-registrati">
+<a href="#section-14.1" class="section-number selfRef">14.1. </a><a href="#name-oauth-parameters-registrati" class="section-name selfRef">OAuth Parameters Registration</a>
+        </h3>
+<p id="section-14.1-1">This specification requests registration of the following values in the IANA "OAuth Parameters" registry of <span>[<a href="#IANA.OAuth.Parameters" class="cite xref">IANA.OAuth.Parameters</a>]</span> established by <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-14.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-14.1-2.1">
+            <p id="section-14.1-2.1.1">Name: <code>attestation_result</code><a href="#section-14.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-14.1-2.2">
+            <p id="section-14.1-2.2.1">Parameter Usage Location: authorization request, token request<a href="#section-14.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-14.1-2.3">
+            <p id="section-14.1-2.3.1">Reference: Section 8 of this document<a href="#section-14.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-14.1-3.1"></li>
+        </ul>
+<ul class="normal">
+<li class="normal" id="section-14.1-4.1">
+            <p id="section-14.1-4.1.1">Name: <code>attestation_profile</code><a href="#section-14.1-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-14.1-4.2">
+            <p id="section-14.1-4.2.1">Parameter Usage Location: authorization request, token request<a href="#section-14.1-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-14.1-4.3">
+            <p id="section-14.1-4.3.1">Reference: Section 8 of this document<a href="#section-14.1-4.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-15">
+      <h2 id="name-references">
+<a href="#section-15" class="section-number selfRef">15. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-15.1">
+        <h3 id="name-normative-references">
+<a href="#section-15.1" class="section-number selfRef">15.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6749">[RFC6749]</dt>
+        <dd>
+<span class="refAuthor">Hardt, D., Ed.</span>, <span class="refTitle">"The OAuth 2.0 Authorization Framework"</span>, <span class="seriesInfo">RFC 6749</span>, <span class="seriesInfo">DOI 10.17487/RFC6749</span>, <time datetime="2012-10" class="refDate">October 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6749">https://www.rfc-editor.org/rfc/rfc6749</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9126">[RFC9126]</dt>
+        <dd>
+<span class="refAuthor">Lodderstedt, T.</span>, <span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Sakimura, N.</span>, <span class="refAuthor">Tonge, D.</span>, and <span class="refAuthor">F. Skokan</span>, <span class="refTitle">"OAuth 2.0 Pushed Authorization Requests"</span>, <span class="seriesInfo">RFC 9126</span>, <span class="seriesInfo">DOI 10.17487/RFC9126</span>, <time datetime="2021-09" class="refDate">September 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9126">https://www.rfc-editor.org/rfc/rfc9126</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9334">[RFC9334]</dt>
+      <dd>
+<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Thaler, D.</span>, <span class="refAuthor">Richardson, M.</span>, <span class="refAuthor">Smith, N.</span>, and <span class="refAuthor">W. Pan</span>, <span class="refTitle">"Remote ATtestation procedureS (RATS) Architecture"</span>, <span class="seriesInfo">RFC 9334</span>, <span class="seriesInfo">DOI 10.17487/RFC9334</span>, <time datetime="2023-01" class="refDate">January 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9334">https://www.rfc-editor.org/rfc/rfc9334</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-15.2">
+        <h3 id="name-informative-references">
+<a href="#section-15.2" class="section-number selfRef">15.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="I-D.ietf-oauth-attestation-based-client-auth">[I-D.ietf-oauth-attestation-based-client-auth]</dt>
+        <dd>
+<span class="refAuthor">Looker, T.</span>, <span class="refAuthor">Bastian, P.</span>, and <span class="refAuthor">C. Bormann</span>, <span class="refTitle">"OAuth 2.0 Attestation-Based Client Authentication"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-oauth-attestation-based-client-auth-09</span>, <time datetime="2026-05-25" class="refDate">25 May 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-attestation-based-client-auth-09">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-attestation-based-client-auth-09</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-oauth-browser-based-apps">[I-D.ietf-oauth-browser-based-apps]</dt>
+        <dd>
+<span class="refAuthor">Parecki, A.</span>, <span class="refAuthor">De Ryck, P.</span>, and <span class="refAuthor">D. Waite</span>, <span class="refTitle">"OAuth 2.0 for Browser-Based Applications"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-oauth-browser-based-apps-26</span>, <time datetime="2025-12-03" class="refDate">3 December 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps-26">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps-26</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-rats-ar4si">[I-D.ietf-rats-ar4si]</dt>
+        <dd>
+<span class="refAuthor">Voit, E.</span>, <span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Hardjono, T.</span>, <span class="refAuthor">Fossati, T.</span>, and <span class="refAuthor">V. Scarlata</span>, <span class="refTitle">"Attestation Results for Secure Interactions"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-ar4si-10</span>, <time datetime="2026-05-18" class="refDate">18 May 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-ar4si-10">https://datatracker.ietf.org/doc/html/draft-ietf-rats-ar4si-10</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-rats-ear">[I-D.ietf-rats-ear]</dt>
+        <dd>
+<span class="refAuthor">Fossati, T.</span>, <span class="refAuthor">Voit, E.</span>, <span class="refAuthor">Trofimov, S.</span>, and <span class="refAuthor">H. Birkholz</span>, <span class="refTitle">"EAT Attestation Results"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-ear-04</span>, <time datetime="2026-05-26" class="refDate">26 May 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-ear-04">https://datatracker.ietf.org/doc/html/draft-ietf-rats-ear-04</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="IANA.OAuth.Parameters">[IANA.OAuth.Parameters]</dt>
+        <dd>
+<span class="refAuthor">Internet Assigned Numbers Authority</span>, <span class="refTitle">"OAuth Parameters"</span>, <span>n.d.</span>, <span>&lt;<a href="https://www.iana.org/assignments/oauth-parameters">https://www.iana.org/assignments/oauth-parameters</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="MekargeA3">[MekargeA3]</dt>
+        <dd>
+<span class="refAuthor">Mekarge</span>, <span class="refTitle">"Mekarge A3"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://a3.mekarge.com/site">https://a3.mekarge.com/site</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="MekargeA3.API">[MekargeA3.API]</dt>
+        <dd>
+<span class="refAuthor">Mekarge</span>, <span class="refTitle">"Mekarge A3 Authorization API"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://a3.mekarge.com/site/docs/api/authorization/">https://a3.mekarge.com/site/docs/api/authorization/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7638">[RFC7638]</dt>
+        <dd>
+<span class="refAuthor">Jones, M.</span> and <span class="refAuthor">N. Sakimura</span>, <span class="refTitle">"JSON Web Key (JWK) Thumbprint"</span>, <span class="seriesInfo">RFC 7638</span>, <span class="seriesInfo">DOI 10.17487/RFC7638</span>, <time datetime="2015-09" class="refDate">September 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7638">https://www.rfc-editor.org/rfc/rfc7638</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7942">[RFC7942]</dt>
+        <dd>
+<span class="refAuthor">Sheffer, Y.</span> and <span class="refAuthor">A. Farrel</span>, <span class="refTitle">"Improving Awareness of Running Code: The Implementation Status Section"</span>, <span class="seriesInfo">BCP 205</span>, <span class="seriesInfo">RFC 7942</span>, <span class="seriesInfo">DOI 10.17487/RFC7942</span>, <time datetime="2016-07" class="refDate">July 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7942">https://www.rfc-editor.org/rfc/rfc7942</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8252">[RFC8252]</dt>
+        <dd>
+<span class="refAuthor">Denniss, W.</span> and <span class="refAuthor">J. Bradley</span>, <span class="refTitle">"OAuth 2.0 for Native Apps"</span>, <span class="seriesInfo">BCP 212</span>, <span class="seriesInfo">RFC 8252</span>, <span class="seriesInfo">DOI 10.17487/RFC8252</span>, <time datetime="2017-10" class="refDate">October 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8252">https://www.rfc-editor.org/rfc/rfc8252</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8792">[RFC8792]</dt>
+        <dd>
+<span class="refAuthor">Watsen, K.</span>, <span class="refAuthor">Auerswald, E.</span>, <span class="refAuthor">Farrel, A.</span>, and <span class="refAuthor">Q. Wu</span>, <span class="refTitle">"Handling Long Lines in Content of Internet-Drafts and RFCs"</span>, <span class="seriesInfo">RFC 8792</span>, <span class="seriesInfo">DOI 10.17487/RFC8792</span>, <time datetime="2020-06" class="refDate">June 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8792">https://www.rfc-editor.org/rfc/rfc8792</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9421">[RFC9421]</dt>
+        <dd>
+<span class="refAuthor">Backman, A., Ed.</span>, <span class="refAuthor">Richer, J., Ed.</span>, and <span class="refAuthor">M. Sporny</span>, <span class="refTitle">"HTTP Message Signatures"</span>, <span class="seriesInfo">RFC 9421</span>, <span class="seriesInfo">DOI 10.17487/RFC9421</span>, <time datetime="2024-02" class="refDate">February 2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9421">https://www.rfc-editor.org/rfc/rfc9421</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9449">[RFC9449]</dt>
+        <dd>
+<span class="refAuthor">Fett, D.</span>, <span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Bradley, J.</span>, <span class="refAuthor">Lodderstedt, T.</span>, <span class="refAuthor">Jones, M.</span>, and <span class="refAuthor">D. Waite</span>, <span class="refTitle">"OAuth 2.0 Demonstrating Proof of Possession (DPoP)"</span>, <span class="seriesInfo">RFC 9449</span>, <span class="seriesInfo">DOI 10.17487/RFC9449</span>, <time datetime="2023-09" class="refDate">September 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9449">https://www.rfc-editor.org/rfc/rfc9449</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="ZTA">[ZTA]</dt>
+      <dd>
+<span class="refAuthor">NIST</span>, <span class="refTitle">"Zero Trust Architecture"</span>, <span>n.d.</span>, <span>&lt;<a href="https://doi.org/10.6028/NIST.SP.800-207">https://doi.org/10.6028/NIST.SP.800-207</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-A">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Efe Kahraman</span></div>
+<div dir="auto" class="left"><span class="org">Mekarge</span></div>
+<div dir="auto" class="left"><span class="street-address">190 Urla</span></div>
+<div dir="auto" class="left">
+<span class="postal-code">35450</span> <span class="locality">Izmir</span>/</div>
+<div dir="auto" class="left"><span class="country-name">Türkiye</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:efe@mekarge.com" class="email">efe@mekarge.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
