@@ -10,16 +10,16 @@ number:
 date:
 consensus: false
 v: 3
-area: SEC
-workgroup: Individual Submission
+area: "Security"
+workgroup: "Web Authorization Protocol"
 keyword:
  - oauth
  - attestation
  - authorization
 venue:
-  mail: hello@mekarge.com
-  github: mekarge/draft-ekahraman-oauth-attestation-authz-native-apps
-  latest: https://mekarge.github.io/draft-ekahraman-oauth-attestation-authz-native-apps/
+  mail: "oauth@ietf.org"
+  github: "mekarge/draft-ekahraman-oauth-attestation-authz-native-app"
+  latest: "https://mekarge.github.io/draft-ekahraman-oauth-attestation-authz-native-app/draft-ekahraman-oauth-attestation-authz-native-app.html"
 
 author:
  -
@@ -82,13 +82,13 @@ This document defines an extension to OAuth 2.0 {{RFC6749}} that enables Authori
 
 This document defines an extension to OAuth 2.0 {{RFC6749}} that enables Authorization Servers to consider Attestation Results presented by Native Applications when issuing access grants. By incorporating information about the security characteristics of the application and its execution environment, this mechanism supports Authorization Policies that are tailored to the trustworthiness of the Native Application.
 
-Consider a scenario where a Native Application is authorized to perform sensitive operations on behalf of a user, such as accessing financial information or initiating transactions. The application may execute on a device that has been modified or is running software capable of monitoring, intercepting, or influencing the application's execution environment. In such cases, information processed by the application or exchanged with remote services may be modified or misused by unauthorized parties. Consequently, authorization decisions based solely on the identity of the user may not accurately reflect the security posture of the requesting environment. 
+Consider a scenario where a Native Application is authorized to perform sensitive operations on behalf of a user, such as accessing financial information or initiating transactions. The application may execute on a device that has been modified or is running software capable of monitoring, intercepting, or influencing the application's execution environment. In such cases, information processed by the application or exchanged with remote services may be modified or misused by unauthorized parties. Consequently, authorization decisions based solely on the identity of the user may not accurately reflect the security posture of the requesting environment.
 
 The Zero Trust Architecture {{ZTA}} suggests that access to a protected resource should be granted by a policy which is evaluated on multiple attributes of the subject. In this regard, granting access to a resource may be determined by a set of attributes including device characteristics and software metadata. This leads to a need for a policy decision algorithm consuming vectors of attributes.
 
 Thinking of Remote Attestation Procedures (RATS) Architecture {{RFC9334}} through the lens of Zero Trust Architecture brings a perspective to further break down the abstract concept of policy decision. It is then possible to conceptualize the subject as Attester which is the device being evaluated. And the Policy Decision Point can be mapped to the Relying Party. This mapping allows reuse of existing standardized roles and flows defined in RATS to design the policy decision functionality.
 
-OAuth 2.0 {{RFC6749}} is an effective way to ground these abstract concepts into operational implementation. The combination of the Native Application, user's device, and relevant Attesting Environments may collectively act as the Attester. The Authorization Server on the other hand relates to the concept of Relying Party. 
+OAuth 2.0 {{RFC6749}} is an effective way to ground these abstract concepts into operational implementation. The combination of the Native Application, user's device, and relevant Attesting Environments may collectively act as the Attester. The Authorization Server on the other hand relates to the concept of Relying Party.
 
 This document defines a mechanism to pass the Attestation Result, signed by the Verifier, to the Authorization Server during token exchange for Native Application Clients. Access tokens are issued only with the scopes permitted by Authorization Decisions derived from the Attestation Result. The flow specified in this document relates to the "Passport Model" in RATS as the Attestation Result is transported to the Authorization Server without requiring direct communication between the Authorization Server and Verifier.
 
@@ -98,8 +98,8 @@ This document defines a mechanism to pass the Attestation Result, signed by the 
 |    Client     |               (B)   |   Verifier    |
 |               |<--------------------+               |
 +-----------+---+                     +---------------+
-    ^       |                                          
-    |       |                                          
+    ^       |
+    |       |
     |       |                         +---------------+
     |       |                   (C)   |               |
     |       +------------------------>| Authorization |
@@ -186,7 +186,7 @@ Authorization Decision
 
 # Evidence Collection {#egen}
 
-Native Applications collect Evidence for the Verifier. Verifier SHOULD provide a Challenge value to test the freshness of the Evidence. When provided, Native Application MUST use the Challenge value when collecting Evidence. Verifier SHOULD generate a Challenge value with sufficient entropy according to the system requirements. 
+Native Applications collect Evidence for the Verifier. Verifier SHOULD provide a Challenge value to test the freshness of the Evidence. When provided, Native Application MUST use the Challenge value when collecting Evidence. Verifier SHOULD generate a Challenge value with sufficient entropy according to the system requirements.
 
 How Native Application fetches the Challenge is beyond the scope of this document. Verifier MAY offer an endpoint as shown below.
 
@@ -219,7 +219,7 @@ This flow includes the following steps:
 
 (A) Native Application sends a request to Attesting Environment to get Evidence by providing necessary claims. Native Application SHOULD present the Challenge value supplied from Verifier in addition to the claims. The message structure is specific to the Attesting Environment and is beyond the scope of this document.
 
-(B) Attesting Environment generates the Evidence. Attesting Environment MUST embed the Challenge value in Evidence when Challenge is present. Attesting Environment SHOULD sign the Evidence with a cryptographic key. 
+(B) Attesting Environment generates the Evidence. Attesting Environment MUST embed the Challenge value in Evidence when Challenge is present. Attesting Environment SHOULD sign the Evidence with a cryptographic key.
 
 # Evidence Verification {#ever}
 
@@ -232,9 +232,9 @@ Verifier creates the Attestation Result based on the Evidence sent by the client
 |               |<--------------------+               |
 +---------------+                     +-----------+---+
                                           ^       |
-                                          |       |        
+                                          |       |
                                      (C)  |       | (B)
-                                          |       v        
+                                          |       v
                                       +---+-----------+
                                       |               |
                                       |  Attesting    |
@@ -253,7 +253,7 @@ This flow includes the following steps:
 
 (D) Verifier processes the information returned from Attesting Environment. Verifier MUST test the Challenge value if it is returned from the Attesting Environment. Verifier MAY implement a lookup table to find the associated Challenge value via the public key JWK or to a stable identifier derived from that key, such as a JWK Thumbprint ([RFC7638]) which is received in the request (A). It's RECOMMENDED for Verifier to check the freshness of the Evidence when Challenge creation timestamp is known. Based on the validations, Verifier creates the Attestation Result.
 
-# Attestation Result Requirements 
+# Attestation Result Requirements
 
 Attestation Result MUST be signed by the Verifier with a cryptographic key.
 
@@ -275,7 +275,7 @@ Only successfully validated Attestation Result is used when evaluating an Author
 Upon receiving the Attestation Result, Authorization Server MUST perform the following steps:
 
 1. Checks if the cryptographic signature of the Attestation Result is valid. The key establishment protocol for the cryptographic key between Verifier and Authorization Server is beyond the scope of this document.
-2. Checks the freshness of the Attestation Result using the creation timestamp. 
+2. Checks the freshness of the Attestation Result using the creation timestamp.
 3. Checks if Verifier ID is present and is trusted by the system.
 4. Checks if the intended Authorization Server points to the server itself.
 5. Checks if Attestation Result contains all necessary Appraisal Assertions required by the Trust Assessments.
@@ -328,7 +328,7 @@ Authorization Server MAY precheck Attestation Result in early stages of the auth
 When Attestation Result is received in authorization request, Authorization Server MUST perform the following steps:
 
 1. Checks if the cryptographic signature of the Attestation Result is valid. The key establishment protocol for the cryptographic key between Verifier and Authorization Server is beyond the scope of this document.
-2. Checks the freshness of the Attestation Result using the creation timestamp. 
+2. Checks the freshness of the Attestation Result using the creation timestamp.
 3. Checks if Verifier ID is present and is trusted by the system.
 4. Checks if the intended Authorization Server points to the server itself.
 5. Checks if Attestation Result contains all necessary Appraisal Assertions required by the Trust Assessments.
@@ -340,15 +340,15 @@ Authorization Server MUST respond with an error if it receives Attestation Resul
 
 ## Relationship with Proof of Possession
 
-Native Application Client can use Proof of Possession method for the token request in the subsequent calls. OAuth 2.0 Demonstrating Proof of Possession (DPoP) {{RFC9449}} is RECOMMENDED for sender-constraining access tokens. Proof of Possession is not a dependency but can be used as complimentary to the mechanism defined in this document. 
+Native Application Client can use Proof of Possession method for the token request in the subsequent calls. OAuth 2.0 Demonstrating Proof of Possession (DPoP) {{RFC9449}} is RECOMMENDED for sender-constraining access tokens. Proof of Possession is not a dependency but can be used as complimentary to the mechanism defined in this document.
 
 # Backend-For-Frontend Pattern {#bff}
 
-The proposed mechanism in this document can also be used for Native Applications connecting to a proxy backend acting as a confidential client. The Backend-For-Frontend pattern for OAuth 2.0 was introduced in OAuth 2.0 for Browser-Based Applications {{I-D.ietf-oauth-browser-based-apps}}. While the Backend-for-Frontend (BFF) pattern was originally designed to solve browser-based security vulnerabilities, it can be adapted to Native Applications. 
+The proposed mechanism in this document can also be used for Native Applications connecting to a proxy backend acting as a confidential client. The Backend-For-Frontend pattern for OAuth 2.0 was introduced in OAuth 2.0 for Browser-Based Applications {{I-D.ietf-oauth-browser-based-apps}}. While the Backend-for-Frontend (BFF) pattern was originally designed to solve browser-based security vulnerabilities, it can be adapted to Native Applications.
 
 By placing a backend layer between Native Application and Authorization Server, responsibility of sending Attestation Result will be shifted to the new layer. From this point onwards this backend layer will be called the Attestation Server.
 
-Attestation Server MAY embed the Verifier functionality, or use a remote Verifier for receiving the Attestation Result. 
+Attestation Server MAY embed the Verifier functionality, or use a remote Verifier for receiving the Attestation Result.
 
 ## Communication Security
 
@@ -364,9 +364,9 @@ According to {{RFC7942}}, "this will allow reviewers and working groups to assig
 
 The organization responsible for this implementation is Mekarge. {{MekargeA3}} is an Authorization Server designed to manage authentication, authorization, and access control for applications and services. By the time of writing this document, Mekarge A3 is available for beta access.
 
-Mekarge A3 implements the mechanism offered in this document with incorporating Backend-For-Frontend pattern described in [](#bff). Mekarge A3 introduces the following concepts: 
+Mekarge A3 implements the mechanism offered in this document with incorporating Backend-For-Frontend pattern described in [](#bff). Mekarge A3 introduces the following concepts:
 
-* Permission as a unique combination of a Resource and one of its scopes. Each permission defines the specific actions and data access rights that can be granted to a client. 
+* Permission as a unique combination of a Resource and one of its scopes. Each permission defines the specific actions and data access rights that can be granted to a client.
 * An Attestation Profile defines a set of Appraisal criteria for evaluating device and Native Application trustworthiness. Attestation Profiles are associated with the permissions. During authorization, Mekarge A3 Authorization Server evaluates all the Appraisals defined for the Attestation Profile and filters the client's granted permissions that are associated with the particular Attestation Profile.
 
 Latest API documentation can be accessed via {{MekargeA3.API}}. The developers can be contacted through [hello@mekarge.com](hello@mekarge.com).
@@ -429,7 +429,7 @@ This specification requests registration of the following values in the IANA "OA
 
 * Reference: Section 8 of this document
 
-> 
+>
 
 * Name: `attestation_profile`
 
