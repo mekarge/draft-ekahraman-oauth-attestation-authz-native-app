@@ -4,7 +4,7 @@ title: "OAuth 2.0 Attestation Based Authorization for Native Applications"
 abbrev: "Attested Authorization for Native Apps"
 category: info
 
-docname: draft-ekahraman-oauth-attestation-authz-native-apps-latest
+docname: draft-ekahraman-oauth-attestation-authz-native-app-latest
 submissiontype: IETF
 number:
 date:
