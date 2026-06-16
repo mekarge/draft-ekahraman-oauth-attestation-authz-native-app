@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-14T02:30:11.406906+00:00",
+  "timestamp": "2026-06-16T02:36:50.192047+00:00",
   "repo": "mekarge/draft-ekahraman-oauth-attestation-authz-native-app",
   "labels": [
     {
@@ -49,6 +49,25 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOS1WQVc8AAAABFao9dQ",
+      "title": "Revise \"Related Works\"",
+      "url": "https://github.com/mekarge/draft-ekahraman-oauth-attestation-authz-native-app/issues/1",
+      "state": "OPEN",
+      "author": "mekarge",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "0x0efe"
+      ],
+      "labels": [],
+      "body": "* Add more details to better articulate the distinction with https://drafts.oauth.net/draft-ietf-oauth-attestation-based-client-auth/draft-ietf-oauth-attestation-based-client-auth.html",
+      "createdAt": "2026-06-14T08:30:23Z",
+      "updatedAt": "2026-06-14T08:30:36Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": []
 }
