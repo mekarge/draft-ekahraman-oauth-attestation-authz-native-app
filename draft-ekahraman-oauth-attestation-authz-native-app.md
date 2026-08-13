@@ -124,7 +124,13 @@ This document does not standardize Evidence collection, Verifier interfaces, or 
 
 ## Related Works
 
-A related approach is proposed in {{I-D.ietf-oauth-attestation-based-client-auth}}, which addresses a mechanism for proving client instance identity and handling authentication. This document addresses the distinct problem of authorization based on attestation.
+A related approach is defined in {{I-D.ietf-oauth-attestation-based-client-auth}}, which specifies how a client instance can present a key-bound client attestation together with proof of possession to an Authorization Server or Resource Server. The mechanism can be used for OAuth client authentication or as an additional security signal providing assurance about the client instance.
+
+The primary distinction is the function performed using the attestation information. {{I-D.ietf-oauth-attestation-based-client-auth}} primarily establishes assurance about a client instance and binds its client attestation to a client instance key, possession of which is demonstrated during the protocol exchange. This document instead specifies how a Verifier-issued Attestation Result is consumed as an input to Authorization Policies and how the resulting Authorization Decisions affect the scopes granted to a Native Application. Consequently, client instance authentication or assurance established by {{I-D.ietf-oauth-attestation-based-client-auth}} does not replace the authorization processing defined by this document.
+
+The two mechanisms can therefore be combined in deployments that require both client-instance assurance and attestation-based authorization. Where a client-held key is bound to attestation information and proof of possession is required, the key binding can additionally provide continuity between the attested client instance and the client participating in the OAuth exchange, while the Attestation Result continues to provide the assertions evaluated by the Authorization Server when making authorization decisions.
+
+This document does not define a common Attestation Result format or claim vocabulary; interoperability at those layers therefore depends on deployment agreement, as discussed in [](#interop).
 
 # Conventions and Definitions
 
@@ -370,6 +376,14 @@ Mekarge A3 implements the mechanism offered in this document with incorporating 
 * An Attestation Profile defines a set of Appraisal criteria for evaluating device and Native Application trustworthiness. Attestation Profiles are associated with the permissions. During authorization, Mekarge A3 Authorization Server evaluates all the Appraisals defined for the Attestation Profile and filters the client's granted permissions that are associated with the particular Attestation Profile.
 
 Latest API documentation can be accessed via {{MekargeA3.API}}. The developers can be contacted through [hello@mekarge.com](hello@mekarge.com).
+
+# Interoperability Considerations {#interop}
+
+This specification defines the OAuth protocol parameters and processing rules used to convey and evaluate Attestation Results. It does not define a single Attestation Result format or attestation claim vocabulary.
+
+Deployments therefore need to agree on the semantics associated with an `attestation_profile`, including the applicable Attestation Result format and the claims that can be consumed by the Authorization Server. Where Authorization Policies depend on such claims, compatible policy semantics are also required between the entities participating in the deployment.
+
+Consequently, support for the protocol extensions defined by this specification does not by itself imply interoperability at the attestation or authorization-policy layer.
 
 # Security Considerations
 
