@@ -4,8 +4,8 @@
 
 Web Authorization Protocol                                   E. Kahraman
 Internet-Draft                                                   Mekarge
-Intended status: Informational                               9 June 2026
-Expires: 11 December 2026
+Intended status: Informational                            13 August 2026
+Expires: 14 February 2027
 
 
    OAuth 2.0 Attestation Based Authorization for Native Applications
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 December 2026.
+   This Internet-Draft will expire on 14 February 2027.
 
 Copyright Notice
 
@@ -90,21 +90,22 @@ Table of Contents
      10.1.  Communication Security
    11. Implementation Status
      11.1.  Mekarge A3
-   12. Security Considerations
-     12.1.  Replay Attacks
-     12.2.  Challenge Freshness
-     12.3.  Downgrade Attacks
-     12.4.  Verifier Compromise
-     12.5.  Device Key Extraction
-   13. Privacy Considerations
-     13.1.  Evidence Exposure
-     13.2.  Attestation Result Exposure
-     13.3.  Secondary Use
-   14. IANA Considerations
-     14.1.  OAuth Parameters Registration
-   15. References
-     15.1.  Normative References
-     15.2.  Informative References
+   12. Interoperability Considerations
+   13. Security Considerations
+     13.1.  Replay Attacks
+     13.2.  Challenge Freshness
+     13.3.  Downgrade Attacks
+     13.4.  Verifier Compromise
+     13.5.  Device Key Extraction
+   14. Privacy Considerations
+     14.1.  Evidence Exposure
+     14.2.  Attestation Result Exposure
+     14.3.  Secondary Use
+   15. IANA Considerations
+     15.1.  OAuth Parameters Registration
+   16. References
+     16.1.  Normative References
+     16.2.  Informative References
    Author's Address
 
 1.  Introduction
@@ -216,11 +217,39 @@ Table of Contents
 
 1.1.  Related Works
 
-   A related approach is proposed in
-   [I-D.ietf-oauth-attestation-based-client-auth], which addresses a
-   mechanism for proving client instance identity and handling
-   authentication.  This document addresses the distinct problem of
-   authorization based on attestation.
+   A related approach is defined in
+   [I-D.ietf-oauth-attestation-based-client-auth], which specifies how a
+   client instance can present a key-bound client attestation together
+   with proof of possession to an Authorization Server or Resource
+   Server.  The mechanism can be used for OAuth client authentication or
+   as an additional security signal providing assurance about the client
+   instance.
+
+   The primary distinction is the function performed using the
+   attestation information.
+   [I-D.ietf-oauth-attestation-based-client-auth] primarily establishes
+   assurance about a client instance and binds its client attestation to
+   a client instance key, possession of which is demonstrated during the
+   protocol exchange.  This document instead specifies how a Verifier-
+   issued Attestation Result is consumed as an input to Authorization
+   Policies and how the resulting Authorization Decisions affect the
+   scopes granted to a Native Application.  Consequently, client
+   instance authentication or assurance established by
+   [I-D.ietf-oauth-attestation-based-client-auth] does not replace the
+   authorization processing defined by this document.
+
+   The two mechanisms can therefore be combined in deployments that
+   require both client-instance assurance and attestation-based
+   authorization.  Where a client-held key is bound to attestation
+   information and proof of possession is required, the key binding can
+   additionally provide continuity between the attested client instance
+   and the client participating in the OAuth exchange, while the
+   Attestation Result continues to provide the assertions evaluated by
+   the Authorization Server when making authorization decisions.
+
+   This document does not define a common Attestation Result format or
+   claim vocabulary; interoperability at those layers therefore depends
+   on deployment agreement, as discussed in Section 12.
 
 2.  Conventions and Definitions
 
@@ -688,9 +717,27 @@ POST /token HTTP/1.1
    developers can be contacted through hello@mekarge.com
    (hello@mekarge.com).
 
-12.  Security Considerations
+12.  Interoperability Considerations
 
-12.1.  Replay Attacks
+   This specification defines the OAuth protocol parameters and
+   processing rules used to convey and evaluate Attestation Results.  It
+   does not define a single Attestation Result format or attestation
+   claim vocabulary.
+
+   Deployments therefore need to agree on the semantics associated with
+   an attestation_profile, including the applicable Attestation Result
+   format and the claims that can be consumed by the Authorization
+   Server.  Where Authorization Policies depend on such claims,
+   compatible policy semantics are also required between the entities
+   participating in the deployment.
+
+   Consequently, support for the protocol extensions defined by this
+   specification does not by itself imply interoperability at the
+   attestation or authorization-policy layer.
+
+13.  Security Considerations
+
+13.1.  Replay Attacks
 
    Authorization Server MUST implement measures to detect replay
    attacks.  Authorization Server MUST check the freshness of the
@@ -702,7 +749,7 @@ POST /token HTTP/1.1
    request, Authorization Server SHOULD use a short time window for
    checking freshness of the Attestation Result.
 
-12.2.  Challenge Freshness
+13.2.  Challenge Freshness
 
    Verifier SHOULD offer a mechanism to provide a fresh Challenge value
    with sufficient entropy to Native Application.  Verifier MUST check
@@ -712,7 +759,7 @@ POST /token HTTP/1.1
    Challenge value is issued.  Verifier SHOULD discard the Challenge
    value on its first occurrence in an Evidence.
 
-12.3.  Downgrade Attacks
+13.3.  Downgrade Attacks
 
    Authorization Server MUST reject the token request if
    attestation_result parameter is not provided and system has an
@@ -724,7 +771,7 @@ POST /token HTTP/1.1
    requested by client and attestation_profile parameter is not
    provided.
 
-12.4.  Verifier Compromise
+13.4.  Verifier Compromise
 
    As aforementioned, Authorization Server MUST check if Verifier ID is
    present and is trusted by the system when processing the Attestation
@@ -736,7 +783,7 @@ POST /token HTTP/1.1
    Result created by the compromised Verifier during Authorization
    Policy evaluation.
 
-12.5.  Device Key Extraction
+13.5.  Device Key Extraction
 
    When client signs the Challenge request using an asymmetric key pair
    as described in Section 4, the security of this model relies on the
@@ -745,9 +792,9 @@ POST /token HTTP/1.1
    device executing Native Application does not support a secure enclave
    or a similar hardware-based storage.
 
-13.  Privacy Considerations
+14.  Privacy Considerations
 
-13.1.  Evidence Exposure
+14.1.  Evidence Exposure
 
    Depending on the Attesting Environment implementation, Evidence might
    contain sensitive data without cryptographic encryption.  In some
@@ -760,7 +807,7 @@ POST /token HTTP/1.1
    metadata to Attesting Environment.  Similarly, Attesting Environment
    MUST only include claims required for the Verifier.
 
-13.2.  Attestation Result Exposure
+14.2.  Attestation Result Exposure
 
    Attestation Result might contain information about the internal state
    of the device, Native Application software, and the Verifier
@@ -785,15 +832,15 @@ POST /token HTTP/1.1
    Authorization Server's responsibility to handle such identifiers,
    such as hashing, anonymizing, or omitting during logging.
 
-13.3.  Secondary Use
+14.3.  Secondary Use
 
    Attestation Results collected for authorization SHOULD not
    automatically be reused for analytics, profiling, or marketing by the
    Authorization Server.
 
-14.  IANA Considerations
+15.  IANA Considerations
 
-14.1.  OAuth Parameters Registration
+15.1.  OAuth Parameters Registration
 
    This specification requests registration of the following values in
    the IANA "OAuth Parameters" registry of [IANA.OAuth.Parameters]
@@ -812,9 +859,9 @@ POST /token HTTP/1.1
 
    *  Reference: Section 8 of this document
 
-15.  References
+16.  References
 
-15.1.  Normative References
+16.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -839,22 +886,22 @@ POST /token HTTP/1.1
               Architecture", RFC 9334, DOI 10.17487/RFC9334, January
               2023, <https://www.rfc-editor.org/rfc/rfc9334>.
 
-15.2.  Informative References
+16.2.  Informative References
 
    [I-D.ietf-oauth-attestation-based-client-auth]
               Looker, T., Bastian, P., and C. Bormann, "OAuth 2.0
               Attestation-Based Client Authentication", Work in
               Progress, Internet-Draft, draft-ietf-oauth-attestation-
-              based-client-auth-09, 25 May 2026,
+              based-client-auth-10, 6 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-oauth-
-              attestation-based-client-auth-09>.
+              attestation-based-client-auth-10>.
 
    [I-D.ietf-oauth-browser-based-apps]
               Parecki, A., De Ryck, P., and D. Waite, "OAuth 2.0 for
               Browser-Based Applications", Work in Progress, Internet-
-              Draft, draft-ietf-oauth-browser-based-apps-26, 3 December
-              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              oauth-browser-based-apps-26>.
+              Draft, draft-ietf-oauth-browser-based-apps-27, 6 July
+              2026, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              oauth-browser-based-apps-27>.
 
    [I-D.ietf-rats-ar4si]
               Voit, E., Birkholz, H., Hardjono, T., Fossati, T., and V.
