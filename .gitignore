@@ -1,4 +1,5 @@
 *.html
+*.xml
 *.pdf
 *.redxml
 *.swp
@@ -13,9 +14,12 @@
 /.refcache
 /.venv/
 /.vscode/
+/.bundle/
+/vendor/
 /lib
 /node_modules/
 /versioned/
+Gemfile
 Gemfile.lock
 archive.json
 draft-ekahraman-oauth-attestation-authz-native-app.xml
