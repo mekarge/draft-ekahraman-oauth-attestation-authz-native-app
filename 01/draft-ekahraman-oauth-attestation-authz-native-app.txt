@@ -4,8 +4,8 @@
 
 Web Authorization Protocol                                   E. Kahraman
 Internet-Draft                                                   Mekarge
-Intended status: Informational                            13 August 2026
-Expires: 14 February 2027
+Intended status: Informational                            18 August 2026
+Expires: 19 February 2027
 
 
    OAuth 2.0 Attestation Based Authorization for Native Applications
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 February 2027.
+   This Internet-Draft will expire on 19 February 2027.
 
 Copyright Notice
 
@@ -78,34 +78,36 @@ Table of Contents
      1.1.  Related Works
    2.  Conventions and Definitions
    3.  Terminology
-   4.  Evidence Collection
-   5.  Evidence Verification
-   6.  Attestation Result Requirements
-   7.  Authorization Server Processing
-     7.1.  Refresh Tokens
-   8.  Protocol Extensions
-   9.  Public Client Considerations
-     9.1.  Relationship with Proof of Possession
-   10. Backend-For-Frontend Pattern
-     10.1.  Communication Security
-   11. Implementation Status
-     11.1.  Mekarge A3
-   12. Interoperability Considerations
-   13. Security Considerations
-     13.1.  Replay Attacks
-     13.2.  Challenge Freshness
-     13.3.  Downgrade Attacks
-     13.4.  Verifier Compromise
-     13.5.  Device Key Extraction
-   14. Privacy Considerations
-     14.1.  Evidence Exposure
-     14.2.  Attestation Result Exposure
-     14.3.  Secondary Use
-   15. IANA Considerations
-     15.1.  OAuth Parameters Registration
-   16. References
-     16.1.  Normative References
-     16.2.  Informative References
+   4.  Native Application Key Requirements
+   5.  Evidence Collection
+   6.  Evidence Verification
+   7.  Attestation Result Requirements
+   8.  Authorization Server Processing
+     8.1.  Attestation Result Key-Binding Check
+     8.2.  Refresh Tokens
+   9.  Protocol Extensions
+   10. Public Client Considerations
+     10.1.  Attestation Result Precheck
+   11. Backend-For-Frontend Pattern
+     11.1.  Communication Security
+   12. Implementation Status
+     12.1.  Mekarge A3
+   13. Interoperability Considerations
+   14. Security Considerations
+     14.1.  Replay Attacks
+     14.2.  Challenge Freshness
+     14.3.  Downgrade Attacks
+     14.4.  Verifier Compromise
+     14.5.  Device Key Extraction
+   15. Privacy Considerations
+     15.1.  Evidence Exposure
+     15.2.  Attestation Result Exposure
+     15.3.  Secondary Use
+   16. IANA Considerations
+     16.1.  OAuth Parameters Registration
+   17. References
+     17.1.  Normative References
+     17.2.  Informative References
    Author's Address
 
 1.  Introduction
@@ -177,12 +179,10 @@ Table of Contents
    This flow includes the following steps:
 
    (A) Client sends all collected Evidence to the Verifier.  Client MAY
-   sign the request with an asymmetric cryptographic key.  If client
-   signs the request, it's RECOMMENDED to send the public JWK in the
-   request body.  It's RECOMMENDED to use HTTP Message Signatures
-   [RFC9421] for the signing implementation and HTTPS as the underlying
-   protocol.  The message structure is beyond the scope of this
-   document.
+   cryptographically protect the integrity and authenticity of the
+   request.  It's RECOMMENDED to use HTTP Message Signatures [RFC9421]
+   for the signing implementation and HTTPS as the underlying protocol.
+   The message structure is beyond the scope of this document.
 
    (B) Verifier creates an Attestation Result based on the Evidence.
    Verifier MUST sign the Attestation Result with a cryptographic key.
@@ -194,7 +194,7 @@ Table of Contents
 
    (C) Client sends the token request to Authorization Server with
    additional parameters including the Attestation Result.  This
-   document defines necessary extensions in Section 8.
+   document defines necessary extensions in Section 9.
 
    (D) The Authorization Server gathers Authorization Policies for each
    requested scope.  For each Authorization Policy, Authorization Server
@@ -249,7 +249,7 @@ Table of Contents
 
    This document does not define a common Attestation Result format or
    claim vocabulary; interoperability at those layers therefore depends
-   on deployment agreement, as discussed in Section 12.
+   on deployment agreement, as discussed in Section 13.
 
 2.  Conventions and Definitions
 
@@ -339,7 +339,24 @@ Table of Contents
       Indicates if a particular scope is granted to a client after the
       evaluation of the associated Authorization Policy.
 
-4.  Evidence Collection
+4.  Native Application Key Requirements
+
+   The mechanism defined in this document requires an Attestation Result
+   to be bound to a Native Application instance.  To establish this
+   binding, the Native Application MUST generate an asymmetric key pair
+   or use an existing asymmetric key pair.  Symmetric key algorithms
+   MUST NOT be used.  The use of an asymmetric key pair allows the
+   public key to be conveyed in the Attestation Result without exposing
+   private key material capable of generating the corresponding Proof of
+   Possession.
+
+   The Native Application MUST use the same key pair throughout the
+   authorization flow and for all subsequent token requests associated
+   with the resulting authorization grant, including refresh token
+   requests.  A new Attestation Result presented with a refresh token
+   request MUST be bound to the same public key.
+
+5.  Evidence Collection
 
    Native Applications collect Evidence for the Verifier.  Verifier
    SHOULD provide a Challenge value to test the freshness of the
@@ -359,12 +376,11 @@ Table of Contents
    This flow includes the following steps:
 
    (A) Native Application requests a Challenge value from Verifier.
-   Native Application MAY sign the request by generating an asymmetric
-   key pair in a secure enclave on the device or use a previously
-   generated key pair.  If request is signed, Native Application MUST
-   send the public key JWK to the Verifier.  It's RECOMMENDED to use
-   HTTP Message Signatures [RFC9421] for the signing implementation and
-   HTTPS as the underlying protocol.
+   Native Application MAY sign the request by the generated key.  If
+   request is signed, Native Application MUST send the public key JWK to
+   the Verifier.  It's RECOMMENDED to use HTTP Message Signatures
+   [RFC9421] for the signing implementation and HTTPS as the underlying
+   protocol.
 
    (B) Verifier generates a fresh Challenge with sufficient entropy.  If
    request is signed and Verifier receives public JWK from Native
@@ -401,7 +417,7 @@ Table of Contents
    is present.  Attesting Environment SHOULD sign the Evidence with a
    cryptographic key.
 
-5.  Evidence Verification
+6.  Evidence Verification
 
    Verifier creates the Attestation Result based on the Evidence sent by
    the client.  Verifier MAY test the integrity and the authenticity of
@@ -427,8 +443,9 @@ Table of Contents
 
    (A) Client sends Evidence to the Verifier.  Evidence MUST include the
    Challenge value if Verifier has provided one during Evidence
-   generation as described in Section 4.  When the Challenge value is
-   used, client MUST send the public key JWK of the Native Application.
+   generation as described in Section 5.  Regardless of whether a
+   Challenge value is used, client MUST send the public key JWK of the
+   Native Application.
 
    (B) If the Evidence is cryptographically signed, Verifier MUST
    validate the signature.  The key establishment protocol for the
@@ -451,9 +468,15 @@ Table of Contents
    JWK Thumbprint ([RFC7638]) which is received in the request (A).
    It's RECOMMENDED for Verifier to check the freshness of the Evidence
    when Challenge creation timestamp is known.  Based on the
-   validations, Verifier creates the Attestation Result.
+   validations, Verifier creates the Attestation Result.  Verifier MUST
+   include public JWK of the Native Application in the Attestation
+   Result.  Before binding a public key JWK to an Attestation Result,
+   the Verifier MUST establish that the Native Application controls the
+   corresponding private key and that the key is associated with the
+   Evidence being appraised.  The mechanism used to establish this
+   association is outside the scope of this document.
 
-6.  Attestation Result Requirements
+7.  Attestation Result Requirements
 
    Attestation Result MUST be signed by the Verifier with a
    cryptographic key.
@@ -462,6 +485,8 @@ Table of Contents
    document.  However, it is RECOMMENDED to include the elements defined
    by the [I-D.ietf-rats-ar4si].  Following information is REQUIRED for
    Attestation Result:
+
+   *  Public key of the Native Application.
 
    *  One or more Appraisal Assertions where each Appraisal Assertion
       corresponding to a distinct aspect of the device or Native
@@ -481,11 +506,19 @@ Table of Contents
 
    The encoding of the Attestation Result is beyond the scope of this
    document.  However implementer MAY choose EAR Tokens as defined in
-   EAT Attestation Results [I-D.ietf-rats-ear].  Verifier MUST use the
-   Attestation Result format and encoding supported by the Authorization
-   Server.
+   EAT Attestation Results [I-D.ietf-rats-ear].
 
-7.  Authorization Server Processing
+   When DPoP [RFC9449] is used as the Proof of Possession mechanism, the
+   Attestation Result MUST convey the Native Application public key as a
+   JWK [RFC7517].  When an EAR Token [I-D.ietf-rats-ear] is used for the
+   Attestation Result in such deployments, it MUST be encoded as a JWT.
+   Profiles using another Proof of Possession mechanism MAY define an
+   alternative representation of the Native Application public key.
+
+   Verifier MUST use the Attestation Result format and encoding
+   supported by the Authorization Server.
+
+8.  Authorization Server Processing
 
    The Authorization Server MUST validate the Attestation Result's
    signature.  Authorization Server MUST accept Attestation Result only
@@ -504,23 +537,26 @@ Table of Contents
        key between Verifier and Authorization Server is beyond the scope
        of this document.
 
-   2.  Checks the freshness of the Attestation Result using the creation
+   2.  Checks if the Native Application still possesses the key pair
+       bound to the Attestation Result (as detailed in Section 8.1).
+
+   3.  Checks the freshness of the Attestation Result using the creation
        timestamp.
 
-   3.  Checks if Verifier ID is present and is trusted by the system.
+   4.  Checks if Verifier ID is present and is trusted by the system.
 
-   4.  Checks if the intended Authorization Server points to the server
+   5.  Checks if the intended Authorization Server points to the server
        itself.
 
-   5.  Checks if Attestation Result contains all necessary Appraisal
+   6.  Checks if Attestation Result contains all necessary Appraisal
        Assertions required by the Trust Assessments.
 
-   6.  For each scope available to the client, Authorization Server
+   7.  For each scope available to the client, Authorization Server
        evaluates the Authorization Policy, which is the specification of
        the Trust Assessments.  How Authorization Policy is defined and
        associated to the scope is beyond the scope of this document.
 
-   7.  Based on the Authorization Decision for each scope, Authorization
+   8.  Based on the Authorization Decision for each scope, Authorization
        Server adds or removes the particular scope from the access
        token.  Authorization Server MAY issue a token containing a
        reduced set of scopes, or MAY reject the request entirely.  If no
@@ -533,7 +569,25 @@ Table of Contents
    the Verifier ID to that access token and refresh token if requested
    by Client.
 
-7.1.  Refresh Tokens
+8.1.  Attestation Result Key-Binding Check
+
+   The Authorization Server MUST verify that the public key whose
+   possession is demonstrated by the Proof of Possession mechanism is
+   the same public key that is bound to the Attestation Result.
+
+   When DPoP [RFC9449] is used as described in Section 10, the
+   Authorization Server MUST compute the SHA-256 JWK Thumbprint, as
+   defined in [RFC7638], of the public key JWK conveyed in the
+   Attestation Result and compare it with the SHA-256 JWK Thumbprint of
+   the public key conveyed in the DPoP proof.  The Authorization Server
+   MUST reject the request if the thumbprints do not match.
+
+   When another Proof of Possession mechanism is used, the applicable
+   profile MUST define how the public key whose possession is
+   demonstrated is identified and how it is compared with the public key
+   bound to the Attestation Result.
+
+8.2.  Refresh Tokens
 
    The Client MUST send an Attestation Result to the Authorization
    Server when using a refresh token grant according to the freshness
@@ -542,7 +596,7 @@ Table of Contents
    single point in time, the Authorization Server MUST reject the
    request if Attestation Result is missing or stale.
 
-8.  Protocol Extensions
+9.  Protocol Extensions
 
    This specification adds two parameters to the Token Endpoint request
    for authorization_code and refresh_token grant types:
@@ -577,50 +631,88 @@ POST /token HTTP/1.1
 
    These parameters are primarily intended for the Token Endpoint,
    unless the front-channel pre-flight optimizations described in
-   Section 9 are utilized.
+   Section 10 are utilized.
 
-9.  Public Client Considerations
+10.  Public Client Considerations
 
-   In this section client is a Public client and is part of the Native
+   In this section client is a public client and is part of the Native
    Application.
 
-   Authorization Server MAY precheck Attestation Result in early stages
-   of the authorization flow in order to avoid unnecessary steps in case
-   Attestation Result is invalid or doesn't meet requirements of target
-   Trust Assesments.  In this case, the parameters defined in Section 8
-   can be used in the authorization request.  However, the Attestation
-   Result can contain some sensitive data that should not be transferred
-   through the front-channel.  The following approaches can be used:
+   Native Application Client MUST use a suitable Proof of Possession
+   mechanism.  It is RECOMMENDED to use OAuth 2.0 Demonstrating Proof of
+   Possession (DPoP) [RFC9449].  Proof of Possession is a dependency for
+   restricting use of the Attestation Result only to the intended Native
+   Application instance.  This specification uses the public key JWK
+   conveyed by a DPoP proof as a means of demonstrating possession of
+   the key bound to an Attestation Result.  This binding is distinct
+   from the sender-constraining of access tokens defined by [RFC9449].
+   Whether an issued access token is DPoP-bound remains governed by
+   [RFC9449].
 
-   *  Verifier can cryptographically encrypt the Attestation Result.
-      Contents of the Attestation Result will remain hidden all the way
-      through the Authorization Server.  But this option can lead to
-      long URLs, which can be problematic due to size limitations that
-      can be enforced from any intermediary hop.
+10.1.  Attestation Result Precheck
 
-   *  Client can use Pushed Authorization Requests [RFC9126] to send the
-      Attestation Token through the back-channel.
+   Authorization Server MAY precheck an Attestation Result during an
+   early stage of the authorization flow in order to avoid unnecessary
+   steps in case Attestation Result is invalid or doesn't meet
+   requirements of target Trust Assesments.  In this case, the
+   parameters defined in Section 9 can be used in the authorization
+   request.
 
-   When Attestation Result is received in authorization request,
-   Authorization Server MUST perform the following steps:
+   An Attestation Result could be conveyed through the front-channel
+   authorization request.  Because an Attestation Result can contain
+   sensitive information, the Verifier would need to cryptographically
+   encrypt it for the Authorization Server.  Contents of the Attestation
+   Result will remain hidden all the way through the Authorization
+   Server, however, this option can lead to long URLs, which can be
+   problematic due to size limitations that can be enforced from any
+   intermediary hop.
+
+   When DPoP is used, the dpop_jkt authorization request parameter
+   defined in [RFC9449] can identify the DPoP public key by its SHA-256
+   JWK Thumbprint ([RFC7638]).  The Authorization Server can compare
+   this value with the public key bound to the Attestation Result.
+   However, dpop_jkt does not by itself demonstrate possession of the
+   corresponding private key and therefore is not sufficient to complete
+   the Attestation Result Key-Binding Check defined in Section 8.1.
+
+   Consequently, a public client using DPoP that requests Attestation
+   Result precheck MUST submit the Attestation Result using Pushed
+   Authorization Requests [RFC9126] and MUST include a DPoP proof in the
+   pushed authorization request as described in Section 10.1 of
+   [RFC9449].  The Authorization Server MUST validate the DPoP proof and
+   MUST perform the Attestation Result Key-Binding Check defined in
+   Section 8.1.  RFC 9449 further requires the subsequent token request
+   to demonstrate possession of the same key.
+
+   A Client that does not use Attestation Result precheck MAY instead
+   submit the Attestation Result at the token endpoint.  Such a Client
+   MAY use dpop_jkt in the authorization request for authorization-code
+   binding as defined in RFC 9449.
+
+   When an Attestation Result is received at the pushed authorization
+   request endpoint for precheck, the Authorization Server MUST perform
+   the following steps:
 
    1.  Checks if the cryptographic signature of the Attestation Result
        is valid.  The key establishment protocol for the cryptographic
        key between Verifier and Authorization Server is beyond the scope
        of this document.
 
-   2.  Checks the freshness of the Attestation Result using the creation
+   2.  Checks if the Native Application still possesses the key pair
+       bound to the Attestation Result (as detailed in Section 8.1).
+
+   3.  Checks the freshness of the Attestation Result using the creation
        timestamp.
 
-   3.  Checks if Verifier ID is present and is trusted by the system.
+   4.  Checks if Verifier ID is present and is trusted by the system.
 
-   4.  Checks if the intended Authorization Server points to the server
+   5.  Checks if the intended Authorization Server points to the server
        itself.
 
-   5.  Checks if Attestation Result contains all necessary Appraisal
+   6.  Checks if Attestation Result contains all necessary Appraisal
        Assertions required by the Trust Assessments.
 
-   6.  Stores the Attestation Result for the Authorization Policy
+   7.  Stores the Attestation Result for the Authorization Policy
        evaluation during the upcoming token request.  Authorization
        Server SHOULD store the Attestation Result with an expiry time
        not longer than the combination of authorization code and request
@@ -635,15 +727,7 @@ POST /token HTTP/1.1
    The error SHOULD indicate invalid_request as defined in Section 5.2
    of [RFC6749]
 
-9.1.  Relationship with Proof of Possession
-
-   Native Application Client can use Proof of Possession method for the
-   token request in the subsequent calls.  OAuth 2.0 Demonstrating Proof
-   of Possession (DPoP) [RFC9449] is RECOMMENDED for sender-constraining
-   access tokens.  Proof of Possession is not a dependency but can be
-   used as complimentary to the mechanism defined in this document.
-
-10.  Backend-For-Frontend Pattern
+11.  Backend-For-Frontend Pattern
 
    The proposed mechanism in this document can also be used for Native
    Applications connecting to a proxy backend acting as a confidential
@@ -658,16 +742,23 @@ POST /token HTTP/1.1
    will be shifted to the new layer.  From this point onwards this
    backend layer will be called the Attestation Server.
 
+   Deployments using an Attestation Server MUST provide a mechanism by
+   which the Authorization Server can independently validate possession
+   of the key bound to the Attestation Result.  The definition of this
+   mechanism is outside the scope of this document.  Profiles defining
+   such deployments MUST specify how the proof is generated, conveyed
+   through the Attestation Server and protected against replay attacks.
+
    Attestation Server MAY embed the Verifier functionality, or use a
    remote Verifier for receiving the Attestation Result.
 
-10.1.  Communication Security
+11.1.  Communication Security
 
    This document does not enforce any particular protocol for the
    messaging between Attestation Server and a remote Verifier.  However
    the implementer MUST use TLS for securing the underlying protocol.
 
-11.  Implementation Status
+12.  Implementation Status
 
    This section records the status of known implementations of the
    protocol defined by this specification at the time of posting of this
@@ -689,7 +780,7 @@ POST /token HTTP/1.1
    It is up to the individual working groups to use this information as
    they see fit".
 
-11.1.  Mekarge A3
+12.1.  Mekarge A3
 
    The organization responsible for this implementation is Mekarge.
    [MekargeA3] is an Authorization Server designed to manage
@@ -698,7 +789,7 @@ POST /token HTTP/1.1
    available for beta access.
 
    Mekarge A3 implements the mechanism offered in this document with
-   incorporating Backend-For-Frontend pattern described in Section 10.
+   incorporating Backend-For-Frontend pattern described in Section 11.
    Mekarge A3 introduces the following concepts:
 
    *  Permission as a unique combination of a Resource and one of its
@@ -717,7 +808,7 @@ POST /token HTTP/1.1
    developers can be contacted through hello@mekarge.com
    (hello@mekarge.com).
 
-12.  Interoperability Considerations
+13.  Interoperability Considerations
 
    This specification defines the OAuth protocol parameters and
    processing rules used to convey and evaluate Attestation Results.  It
@@ -731,25 +822,39 @@ POST /token HTTP/1.1
    compatible policy semantics are also required between the entities
    participating in the deployment.
 
+   Interoperability also depends on the Proof of Possession mechanism
+   used to establish the key binding defined in Section 8.1.  DPoP
+   provides the mechanism specified for public clients in Section 10.
+   Deployments using another Proof of Possession mechanism, including
+   deployments in which an Attestation Server relays a proof generated
+   by the Native Application, require an applicable profile defining how
+   the proof is generated and conveyed to the Authorization Server, how
+   the public key whose possession is demonstrated is identified and
+   compared with the public key bound to the Attestation Result, and how
+   the proof is protected against replay.
+
    Consequently, support for the protocol extensions defined by this
    specification does not by itself imply interoperability at the
-   attestation or authorization-policy layer.
+   attestation, authorization-policy, or deployment-specific key-binding
+   layer.
 
-13.  Security Considerations
+14.  Security Considerations
 
-13.1.  Replay Attacks
+14.1.  Replay Attacks
 
    Authorization Server MUST implement measures to detect replay
    attacks.  Authorization Server MUST check the freshness of the
    Attestation Result using its creation timestamp.  Authorization
-   Server MAY implement additional measures to minimize the clock skew
-   between the source (Verifier) and itself.
+   Server MUST check if the Attestation Result is generated for the
+   intended Native Application.  Authorization Server MAY implement
+   additional measures to minimize the clock skew between the source
+   (Verifier) and itself.
 
    When receiving Attestation Result from public clients on token
    request, Authorization Server SHOULD use a short time window for
    checking freshness of the Attestation Result.
 
-13.2.  Challenge Freshness
+14.2.  Challenge Freshness
 
    Verifier SHOULD offer a mechanism to provide a fresh Challenge value
    with sufficient entropy to Native Application.  Verifier MUST check
@@ -759,7 +864,7 @@ POST /token HTTP/1.1
    Challenge value is issued.  Verifier SHOULD discard the Challenge
    value on its first occurrence in an Evidence.
 
-13.3.  Downgrade Attacks
+14.3.  Downgrade Attacks
 
    Authorization Server MUST reject the token request if
    attestation_result parameter is not provided and system has an
@@ -771,30 +876,29 @@ POST /token HTTP/1.1
    requested by client and attestation_profile parameter is not
    provided.
 
-13.4.  Verifier Compromise
+14.4.  Verifier Compromise
 
    As aforementioned, Authorization Server MUST check if Verifier ID is
    present and is trusted by the system when processing the Attestation
    Result.  In case Verifier is known to be compromised, Authorization
-   Server MUST reject all requests with Attestation Token that are
+   Server MUST reject all requests with Attestation Result that are
    created by the compromised Verifier.  Authorization Server also MUST
    reject any token request using refresh token grant if the original
    token request issuing the refresh token has used the Attestation
    Result created by the compromised Verifier during Authorization
    Policy evaluation.
 
-13.5.  Device Key Extraction
+14.5.  Device Key Extraction
 
-   When client signs the Challenge request using an asymmetric key pair
-   as described in Section 4, the security of this model relies on the
-   device's ability to prevent key extraction.  It is therefore
-   Verifier's responsibility to assess the risk accordingly if the
-   device executing Native Application does not support a secure enclave
-   or a similar hardware-based storage.
+   The security of this mechanism relies on the device's ability to
+   prevent key extraction.  It is therefore Verifier's responsibility to
+   assess the risk accordingly if the device executing Native
+   Application does not support a secure enclave or a similar hardware-
+   based storage.
 
-14.  Privacy Considerations
+15.  Privacy Considerations
 
-14.1.  Evidence Exposure
+15.1.  Evidence Exposure
 
    Depending on the Attesting Environment implementation, Evidence might
    contain sensitive data without cryptographic encryption.  In some
@@ -807,7 +911,7 @@ POST /token HTTP/1.1
    metadata to Attesting Environment.  Similarly, Attesting Environment
    MUST only include claims required for the Verifier.
 
-14.2.  Attestation Result Exposure
+15.2.  Attestation Result Exposure
 
    Attestation Result might contain information about the internal state
    of the device, Native Application software, and the Verifier
@@ -818,8 +922,8 @@ POST /token HTTP/1.1
    if caching is implemented and it is sent to Authorization Server
    through back-channel.  For public clients, if Native Application is
    intended to send Attestation Result before access token request as
-   described in Section 9, it is RECOMMENDED to use Pushed Authorization
-   Requests [RFC9126].
+   described in Section 10, it is RECOMMENDED to use Pushed
+   Authorization Requests [RFC9126].
 
    Authorization Server is responsible for how Attestation Result and
    associated decisions are logged for security and privacy audits.
@@ -832,15 +936,15 @@ POST /token HTTP/1.1
    Authorization Server's responsibility to handle such identifiers,
    such as hashing, anonymizing, or omitting during logging.
 
-14.3.  Secondary Use
+15.3.  Secondary Use
 
    Attestation Results collected for authorization SHOULD not
    automatically be reused for analytics, profiling, or marketing by the
    Authorization Server.
 
-15.  IANA Considerations
+16.  IANA Considerations
 
-15.1.  OAuth Parameters Registration
+16.1.  OAuth Parameters Registration
 
    This specification requests registration of the following values in
    the IANA "OAuth Parameters" registry of [IANA.OAuth.Parameters]
@@ -859,9 +963,9 @@ POST /token HTTP/1.1
 
    *  Reference: Section 8 of this document
 
-16.  References
+17.  References
 
-16.1.  Normative References
+17.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -871,6 +975,14 @@ POST /token HTTP/1.1
    [RFC6749]  Hardt, D., Ed., "The OAuth 2.0 Authorization Framework",
               RFC 6749, DOI 10.17487/RFC6749, October 2012,
               <https://www.rfc-editor.org/rfc/rfc6749>.
+
+   [RFC7517]  Jones, M., "JSON Web Key (JWK)", RFC 7517,
+              DOI 10.17487/RFC7517, May 2015,
+              <https://www.rfc-editor.org/rfc/rfc7517>.
+
+   [RFC7638]  Jones, M. and N. Sakimura, "JSON Web Key (JWK)
+              Thumbprint", RFC 7638, DOI 10.17487/RFC7638, September
+              2015, <https://www.rfc-editor.org/rfc/rfc7638>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
@@ -886,7 +998,12 @@ POST /token HTTP/1.1
               Architecture", RFC 9334, DOI 10.17487/RFC9334, January
               2023, <https://www.rfc-editor.org/rfc/rfc9334>.
 
-16.2.  Informative References
+   [RFC9449]  Fett, D., Campbell, B., Bradley, J., Lodderstedt, T.,
+              Jones, M., and D. Waite, "OAuth 2.0 Demonstrating Proof of
+              Possession (DPoP)", RFC 9449, DOI 10.17487/RFC9449,
+              September 2023, <https://www.rfc-editor.org/rfc/rfc9449>.
+
+17.2.  Informative References
 
    [I-D.ietf-oauth-attestation-based-client-auth]
               Looker, T., Bastian, P., and C. Bormann, "OAuth 2.0
@@ -929,10 +1046,6 @@ POST /token HTTP/1.1
               Mekarge, "Mekarge A3 Authorization API", 2026,
               <https://a3.mekarge.com/site/docs/api/authorization/>.
 
-   [RFC7638]  Jones, M. and N. Sakimura, "JSON Web Key (JWK)
-              Thumbprint", RFC 7638, DOI 10.17487/RFC7638, September
-              2015, <https://www.rfc-editor.org/rfc/rfc7638>.
-
    [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
               Code: The Implementation Status Section", BCP 205,
               RFC 7942, DOI 10.17487/RFC7942, July 2016,
@@ -950,11 +1063,6 @@ POST /token HTTP/1.1
    [RFC9421]  Backman, A., Ed., Richer, J., Ed., and M. Sporny, "HTTP
               Message Signatures", RFC 9421, DOI 10.17487/RFC9421,
               February 2024, <https://www.rfc-editor.org/rfc/rfc9421>.
-
-   [RFC9449]  Fett, D., Campbell, B., Bradley, J., Lodderstedt, T.,
-              Jones, M., and D. Waite, "OAuth 2.0 Demonstrating Proof of
-              Possession (DPoP)", RFC 9449, DOI 10.17487/RFC9449,
-              September 2023, <https://www.rfc-editor.org/rfc/rfc9449>.
 
    [ZTA]      NIST, "Zero Trust Architecture", n.d.,
               <https://doi.org/10.6028/NIST.SP.800-207>.
