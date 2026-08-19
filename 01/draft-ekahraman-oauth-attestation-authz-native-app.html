@@ -1618,18 +1618,20 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
           <p id="section-9-5.1.1"><span class="bcp14">OPTIONAL</span>. References to the Authorization Policy which will evaluate the Attestation Result. Implementer may choose to mark this parameter as <span class="bcp14">REQUIRED</span> when Authorization Server supports definition of multiple Authorization Policies.<a href="#section-9-5.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-9-6">The following example uses "\" line wrapping per <span>[<a href="#RFC8792" class="cite xref">RFC8792</a>]</span> to show a token request. In this example Attestation Result is encoded in JWT as defined in <span>[<a href="#I-D.ietf-rats-ear" class="cite xref">I-D.ietf-rats-ear</a>]</span>.<a href="#section-9-6" class="pilcrow">¶</a></p>
+<p id="section-9-6">The following example uses "\" line wrapping per <span>[<a href="#RFC8792" class="cite xref">RFC8792</a>]</span> to show a token request. The compact DPoP proof and Attestation Result values are abbreviated for readability.<a href="#section-9-6" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-9-7">
 <pre>
 POST /token HTTP/1.1
      Host: server.example.com
      Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
      Content-Type: application/x-www-form-urlencoded
+     DPoP: &lt;DPoP-proof-JWT&gt;
      grant_type=authorization_code\
+     &amp;client_id=s6BhdRkqt3 \
      &amp;code=SplxlOBeZQQYbYS6WxSbIA \
      &amp;redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb \
      &amp;attestation_profile=android \
-     &amp;attestation_result=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlYXRfcHJvZmlsZSI6InRhZzpnaXRodWIuY29tLDIwMjM6dmVyYWlzb24vZWFyIiwiaWF0IjoxNjY2NTI5MzAwLCJlYXIudmVyaWZpZXItaWQiOnsiZGV2ZWxvcGVyIjoiaHR0cHM6Ly92ZXJpZmllci1zZXJ2aWNlIiwiYnVpbGQiOiIwLjAuMSJ9LCJzdWJtb2RzIjp7InBsYXktaW50ZWdyaXR5Ijp7ImVhci5zdGF0dXMiOiJhZmZpcm1pbmciLCJlYXIudHJ1c3R3b3J0aGluZXNzLXZlY3RvciI6eyJyZXF1ZXN0X3BhY2thZ2VfbmFtZSI6Mn19fX0.vSXHlSZokqGPxORoMrKY5Y-0Ge2kVdDKTnyugWD2lkk
+     &amp;attestation_result=&lt;Attestation-Result&gt;
 </pre><a href="#section-9-7" class="pilcrow">¶</a>
 </div>
 <p id="section-9-8">These parameters are primarily intended for the Token Endpoint, unless the front-channel pre-flight optimizations described in <a href="#pub" class="auto internal xref">Section 10</a> are utilized.<a href="#section-9-8" class="pilcrow">¶</a></p>

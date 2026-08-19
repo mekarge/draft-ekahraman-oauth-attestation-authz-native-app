@@ -644,18 +644,20 @@ Table of Contents
       definition of multiple Authorization Policies.
 
    The following example uses "\" line wrapping per [RFC8792] to show a
-   token request.  In this example Attestation Result is encoded in JWT
-   as defined in [I-D.ietf-rats-ear].
+   token request.  The compact DPoP proof and Attestation Result values
+   are abbreviated for readability.
 
-POST /token HTTP/1.1
-     Host: server.example.com
-     Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
-     Content-Type: application/x-www-form-urlencoded
-     grant_type=authorization_code\
-     &code=SplxlOBeZQQYbYS6WxSbIA \
-     &redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb \
-     &attestation_profile=android \
-     &attestation_result=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlYXRfcHJvZmlsZSI6InRhZzpnaXRodWIuY29tLDIwMjM6dmVyYWlzb24vZWFyIiwiaWF0IjoxNjY2NTI5MzAwLCJlYXIudmVyaWZpZXItaWQiOnsiZGV2ZWxvcGVyIjoiaHR0cHM6Ly92ZXJpZmllci1zZXJ2aWNlIiwiYnVpbGQiOiIwLjAuMSJ9LCJzdWJtb2RzIjp7InBsYXktaW50ZWdyaXR5Ijp7ImVhci5zdGF0dXMiOiJhZmZpcm1pbmciLCJlYXIudHJ1c3R3b3J0aGluZXNzLXZlY3RvciI6eyJyZXF1ZXN0X3BhY2thZ2VfbmFtZSI6Mn19fX0.vSXHlSZokqGPxORoMrKY5Y-0Ge2kVdDKTnyugWD2lkk
+   POST /token HTTP/1.1
+        Host: server.example.com
+        Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+        Content-Type: application/x-www-form-urlencoded
+        DPoP: <DPoP-proof-JWT>
+        grant_type=authorization_code\
+        &client_id=s6BhdRkqt3 \
+        &code=SplxlOBeZQQYbYS6WxSbIA \
+        &redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb \
+        &attestation_profile=android \
+        &attestation_result=<Attestation-Result>
 
    These parameters are primarily intended for the Token Endpoint,
    unless the front-channel pre-flight optimizations described in
