@@ -277,6 +277,7 @@ The structure of the Attestation Result is out of scope of this document. Howeve
 * Identity of the Verifier issuing the Attestation Result. This identity can be implemented as the Verifier ID defined in {{I-D.ietf-rats-ar4si}}.
 * Intended Authorization Server. This value SHOULD be the issuer URI used by the Authorization Server.
 * A timestamp value indicating when the Attestation Result is created.
+* A timestamp value indicating when the Attestation Result expires.
 
 The encoding of the Attestation Result is beyond the scope of this document. However implementer MAY choose EAR Tokens as defined in EAT Attestation Results {{I-D.ietf-rats-ear}}.
 
@@ -294,7 +295,7 @@ Upon receiving the Attestation Result, Authorization Server MUST perform the fol
 
 1. Checks if the cryptographic signature of the Attestation Result is valid. The key establishment protocol for the cryptographic key between Verifier and Authorization Server is beyond the scope of this document.
 2. Checks if the Native Application still possesses the key pair bound to the Attestation Result (as detailed in [](#archeck)).
-3. Checks the freshness of the Attestation Result using the creation timestamp.
+3. Checks the freshness of the Attestation Result using the creation timestamp (as detaild in [](#fcheck)).
 4. Checks if Verifier ID is present and is trusted by the system.
 5. Checks if the intended Authorization Server points to the server itself.
 6. Checks if Attestation Result contains all necessary Appraisal Assertions required by the Trust Assessments.
@@ -310,6 +311,12 @@ The Authorization Server MUST verify that the public key whose possession is dem
 When DPoP {{RFC9449}} is used as described in [](#pub), the Authorization Server MUST compute the SHA-256 JWK Thumbprint, as defined in {{RFC7638}}, of the public key JWK conveyed in the Attestation Result and compare it with the SHA-256 JWK Thumbprint of the public key conveyed in the DPoP proof. The Authorization Server MUST reject the request if the thumbprints do not match.
 
 When another Proof of Possession mechanism is used, the applicable profile MUST define how the public key whose possession is demonstrated is identified and how it is compared with the public key bound to the Attestation Result.
+
+## Attestation Result Freshness Check {#fcheck}
+
+Because clock skew can exist between the Verifier and Authorization Server, the Authorization Server MAY apply bounded clock-skew leeway when performing freshness validation. When such leeway is applied, the Authorization Server MUST use separate values for cases in which the Verifier's clock is ahead of or behind the Authorization Server's clock. The permitted offset when the Verifier's clock is ahead of the Authorization Server's clock SHOULD be kept as small as operationally practical because accepting future-dated Attestation Results can extend their effective freshness window.
+
+The Authorization Server SHOULD maintain a securely synchronized clock. The detailed validation procedure, including application of freshness threshods and clock-skew leeway values, is specified in [](#appa).
 
 ## Refresh Tokens
 
@@ -420,7 +427,7 @@ Consequently, support for the protocol extensions defined by this specification 
 
 ## Replay Attacks
 
-Authorization Server MUST implement measures to detect replay attacks. Authorization Server MUST check the freshness of the Attestation Result using its creation timestamp. Authorization Server MUST check if the Attestation Result is generated for the intended Native Application. Authorization Server MAY implement additional measures to minimize the clock skew between the source (Verifier) and itself.
+Authorization Server MUST implement measures to detect replay attacks. Authorization Server MUST check the freshness of the Attestation Result using its creation timestamp. Authorization Server MUST check if the Attestation Result is generated for the intended Native Application.
 
 When receiving Attestation Result from public clients on token request, Authorization Server SHOULD use a short time window for checking freshness of the Attestation Result.
 
@@ -484,4 +491,45 @@ This specification requests registration of the following values in the IANA "OA
 
 --- back
 
+# Detailed Attestation Result Time Validation {#appa}
+
+In this procedure,
+
+* `leeway_verifier_ahead` represents the permitted offset when the Verifier's clock is ahead of the Authorization Server's clock.
+* `leeway_verifier_behind` represents the permitted offset when the Authorization Server's clock is ahead of the Verifier's clock.
+* `freshness_threshold` represents the maximum acceptable age of an Attestation Result, as defined by the Authorization Server.
+
+If the Authorization Server does not apply clock-skew leeway, both leeway values are zero.
+
+Following the event definitions in Appendix A of RFC 9334, let:
+
+* `RG_v`: the Attestation Result generation time, according to the Verifier's clock.
+* `RX_v`: the Attestation Result expiry time, according to the Verifier's clock.
+* `RA_r`: the time at which the Authorization Server appraises the Attestation Result, according to the Authorization Server's clock.
+
+The Authorization Server then validates the Attestation Result using the following checks:
+
+1. `RG_v < RA_r + leeway_verifier_ahead`
+
+    This checks that the Attestation Result was not generated unreasonably far in the future from the Authorization Server's perspective.
+
+    Because a future-dated `RG_v` also reduces the apparent age calculated by Check 2, `leeway_verifier_ahead` SHOULD be kept as small as operationally practical. Accepting an Attestation Result generated up to `leeway_verifier_ahead` in the future can extend its effective freshness window by the same amount.
+
+2. `RA_r - RG_v < freshness_threshold + leeway_verifier_behind`
+
+    This verifies that the Attestation Result is recent enough to meet the Authorization Server's freshness policy.
+
+3. `RA_r < RX_v + leeway_verifier_behind`
+
+    This checks that the Attestation Result has not expired according to the Verifier's declared validity interval.
+
+4. `RX_v > RG_v`
+
+    This checks that the Verifier's declared expiry time is after the generation time.
+
+If the Authorization Server defines a maximum acceptable Attestation Result lifetime (`max_lifetime`), it MUST also apply the following check:
+
+5. `RX_v - RG_v < max_lifetime`
+
+    This checks that the Verifier's declared validity interval is less than the maximum lifetime accepted by the Authorization Server.
 
