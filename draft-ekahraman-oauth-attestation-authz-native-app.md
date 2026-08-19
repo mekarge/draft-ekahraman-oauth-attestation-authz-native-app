@@ -117,13 +117,13 @@ This flow includes the following steps:
 
 (C) Client sends the token request to Authorization Server with additional parameters including the Attestation Result. This document defines necessary extensions in [](#ext).
 
-(D) The Authorization Server gathers Authorization Policies for each requested scope. For each Authorization Policy, Authorization Server obtains Trust Decisions by evaluating the corresponding Trust Assessment. Trust Assesments are predicates using the Attestation Result provided by the client. After each Authorization Policy is evaluated, Authorization Server determines scopes based on Authorization Decisions and issues the access token accordingly.
+(D) The Authorization Server gathers Authorization Policies for each requested scope. For each Authorization Policy, Authorization Server obtains Trust Decisions by evaluating the corresponding Trust Assessment. Trust Assessments are predicates using the Attestation Result provided by the client. After each Authorization Policy is evaluated, Authorization Server determines scopes based on Authorization Decisions and issues the access token accordingly.
 
 Client MAY cache the Attestation Result received from the Verifier for different token requests. In this case, client SHOULD cache the Attestation Result with a short expiry time. Authorization Server MAY reject the token request if the freshness of the Attestation Result doesn't meet system requirements.
 
 This document does not standardize Evidence collection, Verifier interfaces, or Attestation Result formats. It defines only how an Authorization Server consumes Attestation Results during authorization.
 
-## Related Works
+## Related Work
 
 A related approach is defined in {{I-D.ietf-oauth-attestation-based-client-auth}}, which specifies how a client instance can present a key-bound client attestation together with proof of possession to an Authorization Server or Resource Server. The mechanism can be used for OAuth client authentication or as an additional security signal providing assurance about the client instance.
 
@@ -161,7 +161,7 @@ This document additionally defines the following terms:
 
 Native Application (Native App)
 
->  An application that is installed by the user to their device. Different from the "native app" definition in {{Section 3 of RFC8252}}, Native Application is expected to provide device attributes and application metadata.
+>  An application that is installed by the user on their device. Different from the "native app" definition in {{Section 3 of RFC8252}}, Native Application is expected to provide device attributes and application metadata.
 
 Native Application Client
 
@@ -177,7 +177,7 @@ Appraisal Assertion
 
 Trust Assessment
 
-> Evaluation of an Attestation Result according to an APR. APR MAY have separate rule for each Appraisal Assertion forming the Attestation Result.
+> Evaluation of an Attestation Result according to an APR. An APR MAY have separate rule for each Appraisal Assertion forming the Attestation Result.
 
 Trust Decision
 
@@ -217,7 +217,7 @@ This flow includes the following steps:
 
 (B) Verifier generates a fresh Challenge with sufficient entropy. If request is signed and Verifier receives public JWK from Native Application, it MUST bind the generated Challenge value to the public key JWK or to a stable identifier derived from that key, such as a JWK Thumbprint ({{RFC7638}}). Verifier MUST store the Challenge creation timestamp for the freshness check. Verifier MUST make the response uncacheable by adding a `Cache-Control` header set as `no-store`.
 
-Native Application MAY contact with other parties when collecting the Evidence. In terms of RATS architecture, Evidence is created by Attesting Environments. The Attesting Environment can be a remote service provided by a vendor or platform. Message exchange is shown below.
+Native Application MAY contact other parties when collecting the Evidence. In terms of RATS architecture, Evidence is created by Attesting Environments. The Attesting Environment can be a remote service provided by a vendor or platform. Message exchange is shown below.
 
 ~~~ ascii-art
 +---------------+               (A)   +---------------+
@@ -279,7 +279,7 @@ The structure of the Attestation Result is out of scope of this document. Howeve
 * A timestamp value indicating when the Attestation Result is created.
 * A timestamp value indicating when the Attestation Result expires.
 
-The encoding of the Attestation Result is beyond the scope of this document. However implementer MAY choose EAR Tokens as defined in EAT Attestation Results {{I-D.ietf-rats-ear}}.
+The encoding of the Attestation Result is beyond the scope of this document. However, the implementer MAY choose EAR Tokens as defined in EAT Attestation Results {{I-D.ietf-rats-ear}}.
 
 When DPoP {{RFC9449}} is used as the Proof of Possession mechanism, the Attestation Result MUST convey the Native Application public key as a JWK {{RFC7517}}. When an EAR Token {{I-D.ietf-rats-ear}} is used for the Attestation Result in such deployments, it MUST be encoded as a JWT. Profiles using another Proof of Possession mechanism MAY define an alternative representation of the Native Application public key.
 
@@ -295,7 +295,7 @@ Upon receiving the Attestation Result, Authorization Server MUST perform the fol
 
 1. Checks if the cryptographic signature of the Attestation Result is valid. The key establishment protocol for the cryptographic key between Verifier and Authorization Server is beyond the scope of this document.
 2. Checks if the Native Application still possesses the key pair bound to the Attestation Result (as detailed in [](#archeck)).
-3. Checks the freshness of the Attestation Result using the creation timestamp (as detaild in [](#fcheck)).
+3. Checks the freshness of the Attestation Result using the creation timestamp (as detailed in [](#fcheck)).
 4. Checks if Verifier ID is present and is trusted by the system.
 5. Checks if the intended Authorization Server points to the server itself.
 6. Checks if Attestation Result contains all necessary Appraisal Assertions required by the Trust Assessments.
@@ -316,7 +316,7 @@ When another Proof of Possession mechanism is used, the applicable profile MUST 
 
 Because clock skew can exist between the Verifier and Authorization Server, the Authorization Server MAY apply bounded clock-skew leeway when performing freshness validation. When such leeway is applied, the Authorization Server MUST use separate values for cases in which the Verifier's clock is ahead of or behind the Authorization Server's clock. The permitted offset when the Verifier's clock is ahead of the Authorization Server's clock SHOULD be kept as small as operationally practical because accepting future-dated Attestation Results can extend their effective freshness window.
 
-The Authorization Server SHOULD maintain a securely synchronized clock. The detailed validation procedure, including application of freshness threshods and clock-skew leeway values, is specified in [](#appa).
+The Authorization Server SHOULD maintain a securely synchronized clock. The detailed validation procedure, including application of freshness thresholds and clock-skew leeway values, is specified in [](#appa).
 
 The freshness check establishes that the Attestation Result satisfies the Authorization Server's freshness policy at the time it is appraised. It does not establish that the Native Application remains in the attested state throughout the lifetime of an access token issued based on that result.
 
@@ -334,7 +334,7 @@ This specification adds two parameters to the Token Endpoint request for `author
 
 `attestation_profile`
 
-> OPTIONAL. References to the Authorization Policy which will evaluate the Attestation Result. Implementer may choose to mark this parameter as REQUIRED when Authorization Server supports definition of multiple Authorization Policies.
+> OPTIONAL. References to the Authorization Policy which will evaluate the Attestation Result. The implementer MAY require this parameter when Authorization Server supports definition of multiple Authorization Policies.
 
 The following example uses "\\" line wrapping per {{RFC8792}} to show a token request. The compact DPoP proof and Attestation Result values are abbreviated for readability.
 
@@ -362,7 +362,7 @@ Native Application Client MUST use a suitable Proof of Possession mechanism. It 
 
 ## Attestation Result Precheck
 
-Authorization Server MAY precheck an Attestation Result during an early stage of the authorization flow in order to avoid unnecessary steps in case Attestation Result is invalid or doesn't meet requirements of target Trust Assesments. In this case, the parameters defined in [](#ext) can be used in the authorization request.
+Authorization Server MAY precheck an Attestation Result during an early stage of the authorization flow in order to avoid unnecessary steps in case Attestation Result is invalid or doesn't meet requirements of target Trust Assessments. In this case, the parameters defined in [](#ext) can be used in the authorization request.
 
 An Attestation Result could be conveyed through the front-channel authorization request. Because an Attestation Result can contain sensitive information, the Verifier would need to cryptographically encrypt it for the Authorization Server. Contents of the Attestation Result will remain hidden all the way through the Authorization Server, however, this option can lead to long URLs, which can be problematic due to size limitations that can be enforced from any intermediary hop.
 
@@ -398,7 +398,7 @@ Attestation Server MAY embed the Verifier functionality, or use a remote Verifie
 
 ## Communication Security
 
-This document does not enforce any particular protocol for the messaging between Attestation Server and a remote Verifier. However the implementer MUST use TLS for securing the underlying protocol.
+This document does not enforce any particular protocol for the messaging between Attestation Server and a remote Verifier. However, the implementer MUST use TLS for securing the underlying protocol.
 
 # Implementation Status
 
