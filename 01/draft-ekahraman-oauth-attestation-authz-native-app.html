@@ -1232,6 +1232,9 @@ svg {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.5">
                 <p id="section-toc.1-1.14.2.5.1"><a href="#section-14.5" class="auto internal xref">14.5</a>.  <a href="#name-device-key-extraction" class="internal xref">Device Key Extraction</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.6">
+                <p id="section-toc.1-1.14.2.6.1"><a href="#section-14.6" class="auto internal xref">14.6</a>.  <a href="#name-attestation-result-temporal" class="internal xref">Attestation Result Temporal Limitations</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
@@ -1584,6 +1587,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         </h3>
 <p id="section-8.2-1">Because clock skew can exist between the Verifier and Authorization Server, the Authorization Server <span class="bcp14">MAY</span> apply bounded clock-skew leeway when performing freshness validation. When such leeway is applied, the Authorization Server <span class="bcp14">MUST</span> use separate values for cases in which the Verifier's clock is ahead of or behind the Authorization Server's clock. The permitted offset when the Verifier's clock is ahead of the Authorization Server's clock <span class="bcp14">SHOULD</span> be kept as small as operationally practical because accepting future-dated Attestation Results can extend their effective freshness window.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 <p id="section-8.2-2">The Authorization Server <span class="bcp14">SHOULD</span> maintain a securely synchronized clock. The detailed validation procedure, including application of freshness threshods and clock-skew leeway values, is specified in <a href="#appa" class="auto internal xref">Appendix A</a>.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
+<p id="section-8.2-3">The freshness check establishes that the Attestation Result satisfies the Authorization Server's freshness policy at the time it is appraised. It does not establish that the Native Application remains in the attested state throughout the lifetime of an access token issued based on that result.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="refresh-tokens">
@@ -1780,6 +1784,14 @@ POST /token HTTP/1.1
 <a href="#section-14.5" class="section-number selfRef">14.5. </a><a href="#name-device-key-extraction" class="section-name selfRef">Device Key Extraction</a>
         </h3>
 <p id="section-14.5-1">The security of this mechanism relies on the device's ability to prevent key extraction. It is therefore Verifier's responsibility to assess the risk accordingly if the device executing Native Application does not support a secure enclave or a similar hardware-based storage.<a href="#section-14.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="attestation-result-temporal-limitations">
+<section id="section-14.6">
+        <h3 id="name-attestation-result-temporal">
+<a href="#section-14.6" class="section-number selfRef">14.6. </a><a href="#name-attestation-result-temporal" class="section-name selfRef">Attestation Result Temporal Limitations</a>
+        </h3>
+<p id="section-14.6-1">An Attestation Result represents a snapshot of the Native Application and its execution environment. The freshness checks defined in <a href="#fcheck" class="auto internal xref">Section 8.2</a> bound the age of that snapshot when the Authorization Server makes an authorization decision, but do not provide continuous assurance during subsequent use of the resulting access token. The state of the Native Application can change after token issuance, including becoming compromised while the access token remains valid. Deployments requiring a tighter bound on this risk can use shorter access token lifetimes, more frequent re-attestation, or other deployment-specific mechanisms.<a href="#section-14.6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>

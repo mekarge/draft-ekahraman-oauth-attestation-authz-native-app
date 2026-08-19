@@ -100,6 +100,7 @@ Table of Contents
      14.3.  Downgrade Attacks
      14.4.  Verifier Compromise
      14.5.  Device Key Extraction
+     14.6.  Attestation Result Temporal Limitations
    15. Privacy Considerations
      15.1.  Evidence Exposure
      15.2.  Attestation Result Exposure
@@ -608,6 +609,12 @@ Table of Contents
    freshness threshods and clock-skew leeway values, is specified in
    Appendix A.
 
+   The freshness check establishes that the Attestation Result satisfies
+   the Authorization Server's freshness policy at the time it is
+   appraised.  It does not establish that the Native Application remains
+   in the attested state throughout the lifetime of an access token
+   issued based on that result.
+
 8.3.  Refresh Tokens
 
    The Client MUST send an Attestation Result to the Authorization
@@ -914,6 +921,19 @@ POST /token HTTP/1.1
    assess the risk accordingly if the device executing Native
    Application does not support a secure enclave or a similar hardware-
    based storage.
+
+14.6.  Attestation Result Temporal Limitations
+
+   An Attestation Result represents a snapshot of the Native Application
+   and its execution environment.  The freshness checks defined in
+   Section 8.2 bound the age of that snapshot when the Authorization
+   Server makes an authorization decision, but do not provide continuous
+   assurance during subsequent use of the resulting access token.  The
+   state of the Native Application can change after token issuance,
+   including becoming compromised while the access token remains valid.
+   Deployments requiring a tighter bound on this risk can use shorter
+   access token lifetimes, more frequent re-attestation, or other
+   deployment-specific mechanisms.
 
 15.  Privacy Considerations
 
