@@ -1047,7 +1047,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Kahraman</td>
-<td class="center">Expires 19 February 2027</td>
+<td class="center">Expires 20 February 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1060,12 +1060,12 @@ svg {
 <dd class="internet-draft">draft-ekahraman-oauth-attestation-authz-native-app-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-08-18" class="published">18 August 2026</time>
+<time datetime="2026-08-19" class="published">19 August 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-02-19">19 February 2027</time></dd>
+<dd class="expires"><time datetime="2027-02-20">20 February 2027</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1115,7 +1115,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 19 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 20 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1177,7 +1177,10 @@ svg {
                 <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-attestation-result-key-bind" class="internal xref">Attestation Result Key-Binding Check</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
-                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-refresh-tokens" class="internal xref">Refresh Tokens</a></p>
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-attestation-result-freshnes" class="internal xref">Attestation Result Freshness Check</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-refresh-tokens" class="internal xref">Refresh Tokens</a></p>
 </li>
             </ul>
 </li>
@@ -1265,7 +1268,10 @@ svg {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18">
-            <p id="section-toc.1-1.18.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.18.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-detailed-attestation-result" class="internal xref">Detailed Attestation Result Time Validation</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19">
+            <p id="section-toc.1-1.19.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1517,6 +1523,9 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         <li class="normal" id="section-7-3.5">
           <p id="section-7-3.5.1">A timestamp value indicating when the Attestation Result is created.<a href="#section-7-3.5.1" class="pilcrow">¶</a></p>
 </li>
+        <li class="normal" id="section-7-3.6">
+          <p id="section-7-3.6.1">A timestamp value indicating when the Attestation Result expires.<a href="#section-7-3.6.1" class="pilcrow">¶</a></p>
+</li>
       </ul>
 <p id="section-7-4">The encoding of the Attestation Result is beyond the scope of this document. However implementer <span class="bcp14">MAY</span> choose EAR Tokens as defined in EAT Attestation Results <span>[<a href="#I-D.ietf-rats-ear" class="cite xref">I-D.ietf-rats-ear</a>]</span>.<a href="#section-7-4" class="pilcrow">¶</a></p>
 <p id="section-7-5">When DPoP <span>[<a href="#RFC9449" class="cite xref">RFC9449</a>]</span> is used as the Proof of Possession mechanism, the Attestation Result <span class="bcp14">MUST</span> convey the Native Application public key as a JWK <span>[<a href="#RFC7517" class="cite xref">RFC7517</a>]</span>. When an EAR Token <span>[<a href="#I-D.ietf-rats-ear" class="cite xref">I-D.ietf-rats-ear</a>]</span> is used for the Attestation Result in such deployments, it <span class="bcp14">MUST</span> be encoded as a JWT. Profiles using another Proof of Possession mechanism <span class="bcp14">MAY</span> define an alternative representation of the Native Application public key.<a href="#section-7-5" class="pilcrow">¶</a></p>
@@ -1539,7 +1548,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
           <p id="section-8-4.2.1">Checks if the Native Application still possesses the key pair bound to the Attestation Result (as detailed in <a href="#archeck" class="auto internal xref">Section 8.1</a>).<a href="#section-8-4.2.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-8-4.3">
-          <p id="section-8-4.3.1">Checks the freshness of the Attestation Result using the creation timestamp.<a href="#section-8-4.3.1" class="pilcrow">¶</a></p>
+          <p id="section-8-4.3.1">Checks the freshness of the Attestation Result using the creation timestamp (as detaild in <a href="#fcheck" class="auto internal xref">Section 8.2</a>).<a href="#section-8-4.3.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-8-4.4">
           <p id="section-8-4.4.1">Checks if Verifier ID is present and is trusted by the system.<a href="#section-8-4.4.1" class="pilcrow">¶</a></p>
@@ -1568,12 +1577,21 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-8.1-3">When another Proof of Possession mechanism is used, the applicable profile <span class="bcp14">MUST</span> define how the public key whose possession is demonstrated is identified and how it is compared with the public key bound to the Attestation Result.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="refresh-tokens">
+<div id="fcheck">
 <section id="section-8.2">
-        <h3 id="name-refresh-tokens">
-<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-refresh-tokens" class="section-name selfRef">Refresh Tokens</a>
+        <h3 id="name-attestation-result-freshnes">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-attestation-result-freshnes" class="section-name selfRef">Attestation Result Freshness Check</a>
         </h3>
-<p id="section-8.2-1">The Client <span class="bcp14">MUST</span> send an Attestation Result to the Authorization Server when using a refresh token grant according to the freshness window required by the Authorization Server. Because Attestation Results are snapshots of Native Application's runtime state at a single point in time, the Authorization Server <span class="bcp14">MUST</span> reject the request if Attestation Result is missing or stale.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-1">Because clock skew can exist between the Verifier and Authorization Server, the Authorization Server <span class="bcp14">MAY</span> apply bounded clock-skew leeway when performing freshness validation. When such leeway is applied, the Authorization Server <span class="bcp14">MUST</span> use separate values for cases in which the Verifier's clock is ahead of or behind the Authorization Server's clock. The permitted offset when the Verifier's clock is ahead of the Authorization Server's clock <span class="bcp14">SHOULD</span> be kept as small as operationally practical because accepting future-dated Attestation Results can extend their effective freshness window.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-2">The Authorization Server <span class="bcp14">SHOULD</span> maintain a securely synchronized clock. The detailed validation procedure, including application of freshness threshods and clock-skew leeway values, is specified in <a href="#appa" class="auto internal xref">Appendix A</a>.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="refresh-tokens">
+<section id="section-8.3">
+        <h3 id="name-refresh-tokens">
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-refresh-tokens" class="section-name selfRef">Refresh Tokens</a>
+        </h3>
+<p id="section-8.3-1">The Client <span class="bcp14">MUST</span> send an Attestation Result to the Authorization Server when using a refresh token grant according to the freshness window required by the Authorization Server. Because Attestation Results are snapshots of Native Application's runtime state at a single point in time, the Authorization Server <span class="bcp14">MUST</span> reject the request if Attestation Result is missing or stale.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1727,7 +1745,7 @@ POST /token HTTP/1.1
         <h3 id="name-replay-attacks">
 <a href="#section-14.1" class="section-number selfRef">14.1. </a><a href="#name-replay-attacks" class="section-name selfRef">Replay Attacks</a>
         </h3>
-<p id="section-14.1-1">Authorization Server <span class="bcp14">MUST</span> implement measures to detect replay attacks. Authorization Server <span class="bcp14">MUST</span> check the freshness of the Attestation Result using its creation timestamp. Authorization Server <span class="bcp14">MUST</span> check if the Attestation Result is generated for the intended Native Application. Authorization Server <span class="bcp14">MAY</span> implement additional measures to minimize the clock skew between the source (Verifier) and itself.<a href="#section-14.1-1" class="pilcrow">¶</a></p>
+<p id="section-14.1-1">Authorization Server <span class="bcp14">MUST</span> implement measures to detect replay attacks. Authorization Server <span class="bcp14">MUST</span> check the freshness of the Attestation Result using its creation timestamp. Authorization Server <span class="bcp14">MUST</span> check if the Attestation Result is generated for the intended Native Application.<a href="#section-14.1-1" class="pilcrow">¶</a></p>
 <p id="section-14.1-2">When receiving Attestation Result from public clients on token request, Authorization Server <span class="bcp14">SHOULD</span> use a short time window for checking freshness of the Attestation Result.<a href="#section-14.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1945,8 +1963,73 @@ POST /token HTTP/1.1
 </div>
 </section>
 </div>
-<div id="authors-addresses">
+<div id="appa">
 <section id="appendix-A">
+      <h2 id="name-detailed-attestation-result">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-detailed-attestation-result" class="section-name selfRef">Detailed Attestation Result Time Validation</a>
+      </h2>
+<p id="appendix-A-1">In this procedure,<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-A-2.1">
+          <p id="appendix-A-2.1.1"><code>leeway_verifier_ahead</code> represents the permitted offset when the Verifier's clock is ahead of the Authorization Server's clock.<a href="#appendix-A-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.2">
+          <p id="appendix-A-2.2.1"><code>leeway_verifier_behind</code> represents the permitted offset when the Authorization Server's clock is ahead of the Verifier's clock.<a href="#appendix-A-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.3">
+          <p id="appendix-A-2.3.1"><code>freshness_threshold</code> represents the maximum acceptable age of an Attestation Result, as defined by the Authorization Server.<a href="#appendix-A-2.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="appendix-A-3">If the Authorization Server does not apply clock-skew leeway, both leeway values are zero.<a href="#appendix-A-3" class="pilcrow">¶</a></p>
+<p id="appendix-A-4">Following the event definitions in Appendix A of RFC 9334, let:<a href="#appendix-A-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-A-5.1">
+          <p id="appendix-A-5.1.1"><code>RG_v</code>: the Attestation Result generation time, according to the Verifier's clock.<a href="#appendix-A-5.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-5.2">
+          <p id="appendix-A-5.2.1"><code>RX_v</code>: the Attestation Result expiry time, according to the Verifier's clock.<a href="#appendix-A-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-5.3">
+          <p id="appendix-A-5.3.1"><code>RA_r</code>: the time at which the Authorization Server appraises the Attestation Result, according to the Authorization Server's clock.<a href="#appendix-A-5.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="appendix-A-6">The Authorization Server then validates the Attestation Result using the following checks:<a href="#appendix-A-6" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="appendix-A-7">
+<li id="appendix-A-7.1">
+          <p id="appendix-A-7.1.1"><code>RG_v &lt; RA_r + leeway_verifier_ahead</code><a href="#appendix-A-7.1.1" class="pilcrow">¶</a></p>
+<p id="appendix-A-7.1.2">
+This checks that the Attestation Result was not generated unreasonably far in the future from the Authorization Server's perspective.<a href="#appendix-A-7.1.2" class="pilcrow">¶</a></p>
+<p id="appendix-A-7.1.3">
+Because a future-dated <code>RG_v</code> also reduces the apparent age calculated by Check 2, <code>leeway_verifier_ahead</code> <span class="bcp14">SHOULD</span> be kept as small as operationally practical. Accepting an Attestation Result generated up to <code>leeway_verifier_ahead</code> in the future can extend its effective freshness window by the same amount.<a href="#appendix-A-7.1.3" class="pilcrow">¶</a></p>
+</li>
+        <li id="appendix-A-7.2">
+          <p id="appendix-A-7.2.1"><code>RA_r - RG_v &lt; freshness_threshold + leeway_verifier_behind</code><a href="#appendix-A-7.2.1" class="pilcrow">¶</a></p>
+<p id="appendix-A-7.2.2">
+This verifies that the Attestation Result is recent enough to meet the Authorization Server's freshness policy.<a href="#appendix-A-7.2.2" class="pilcrow">¶</a></p>
+</li>
+        <li id="appendix-A-7.3">
+          <p id="appendix-A-7.3.1"><code>RA_r &lt; RX_v + leeway_verifier_behind</code><a href="#appendix-A-7.3.1" class="pilcrow">¶</a></p>
+<p id="appendix-A-7.3.2">
+This checks that the Attestation Result has not expired according to the Verifier's declared validity interval.<a href="#appendix-A-7.3.2" class="pilcrow">¶</a></p>
+</li>
+        <li id="appendix-A-7.4">
+          <p id="appendix-A-7.4.1"><code>RX_v &gt; RG_v</code><a href="#appendix-A-7.4.1" class="pilcrow">¶</a></p>
+<p id="appendix-A-7.4.2">
+This checks that the Verifier's declared expiry time is after the generation time.<a href="#appendix-A-7.4.2" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+<p id="appendix-A-8">If the Authorization Server defines a maximum acceptable Attestation Result lifetime (<code>max_lifetime</code>), it <span class="bcp14">MUST</span> also apply the following check:<a href="#appendix-A-8" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="appendix-A-9">
+<li id="appendix-A-9.1">
+          <p id="appendix-A-9.1.1"><code>RX_v - RG_v &lt; max_lifetime</code><a href="#appendix-A-9.1.1" class="pilcrow">¶</a></p>
+<p id="appendix-A-9.1.2">
+This checks that the Verifier's declared validity interval is less than the maximum lifetime accepted by the Authorization Server.<a href="#appendix-A-9.1.2" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-B">
       <h2 id="name-authors-address">
 <a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
       </h2>
