@@ -1148,7 +1148,7 @@ svg {
             <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
-                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-related-works" class="internal xref">Related Works</a></p>
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-related-work" class="internal xref">Related Work</a></p>
 </li>
             </ul>
 </li>
@@ -1274,7 +1274,10 @@ svg {
             <p id="section-toc.1-1.18.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-detailed-attestation-result" class="internal xref">Detailed Attestation Result Time Validation</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19">
-            <p id="section-toc.1-1.19.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.19.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-document-history" class="internal xref">Document History</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.20">
+            <p id="section-toc.1-1.20.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1312,13 +1315,13 @@ svg {
 <p id="section-1-9">(A) Client sends all collected Evidence to the Verifier. Client <span class="bcp14">MAY</span> cryptographically protect the integrity and authenticity of the request. It's <span class="bcp14">RECOMMENDED</span> to use HTTP Message Signatures <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> for the signing implementation and HTTPS as the underlying protocol. The message structure is beyond the scope of this document.<a href="#section-1-9" class="pilcrow">¶</a></p>
 <p id="section-1-10">(B) Verifier creates an Attestation Result based on the Evidence. Verifier <span class="bcp14">MUST</span> sign the Attestation Result with a cryptographic key. For asymmetric keys, Verifier <span class="bcp14">MUST</span> share the public key with Authorization Server. For both asymmetric and symmetric keys, key establishment protocol is beyond the scope of this document. Verifier <span class="bcp14">MUST</span> make the response uncacheable by adding a <code>Cache-Control</code> header set as <code>no-store</code>.<a href="#section-1-10" class="pilcrow">¶</a></p>
 <p id="section-1-11">(C) Client sends the token request to Authorization Server with additional parameters including the Attestation Result. This document defines necessary extensions in <a href="#ext" class="auto internal xref">Section 9</a>.<a href="#section-1-11" class="pilcrow">¶</a></p>
-<p id="section-1-12">(D) The Authorization Server gathers Authorization Policies for each requested scope. For each Authorization Policy, Authorization Server obtains Trust Decisions by evaluating the corresponding Trust Assessment. Trust Assesments are predicates using the Attestation Result provided by the client. After each Authorization Policy is evaluated, Authorization Server determines scopes based on Authorization Decisions and issues the access token accordingly.<a href="#section-1-12" class="pilcrow">¶</a></p>
+<p id="section-1-12">(D) The Authorization Server gathers Authorization Policies for each requested scope. For each Authorization Policy, Authorization Server obtains Trust Decisions by evaluating the corresponding Trust Assessment. Trust Assessments are predicates using the Attestation Result provided by the client. After each Authorization Policy is evaluated, Authorization Server determines scopes based on Authorization Decisions and issues the access token accordingly.<a href="#section-1-12" class="pilcrow">¶</a></p>
 <p id="section-1-13">Client <span class="bcp14">MAY</span> cache the Attestation Result received from the Verifier for different token requests. In this case, client <span class="bcp14">SHOULD</span> cache the Attestation Result with a short expiry time. Authorization Server <span class="bcp14">MAY</span> reject the token request if the freshness of the Attestation Result doesn't meet system requirements.<a href="#section-1-13" class="pilcrow">¶</a></p>
 <p id="section-1-14">This document does not standardize Evidence collection, Verifier interfaces, or Attestation Result formats. It defines only how an Authorization Server consumes Attestation Results during authorization.<a href="#section-1-14" class="pilcrow">¶</a></p>
-<div id="related-works">
+<div id="related-work">
 <section id="section-1.1">
-        <h3 id="name-related-works">
-<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-related-works" class="section-name selfRef">Related Works</a>
+        <h3 id="name-related-work">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-related-work" class="section-name selfRef">Related Work</a>
         </h3>
 <p id="section-1.1-1">A related approach is defined in <span>[<a href="#I-D.ietf-oauth-attestation-based-client-auth" class="cite xref">I-D.ietf-oauth-attestation-based-client-auth</a>]</span>, which specifies how a client instance can present a key-bound client attestation together with proof of possession to an Authorization Server or Resource Server. The mechanism can be used for OAuth client authentication or as an additional security signal providing assurance about the client instance.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
 <p id="section-1.1-2">The primary distinction is the function performed using the attestation information. <span>[<a href="#I-D.ietf-oauth-attestation-based-client-auth" class="cite xref">I-D.ietf-oauth-attestation-based-client-auth</a>]</span> primarily establishes assurance about a client instance and binds its client attestation to a client instance key, possession of which is demonstrated during the protocol exchange. This document instead specifies how a Verifier-issued Attestation Result is consumed as an input to Authorization Policies and how the resulting Authorization Decisions affect the scopes granted to a Native Application. Consequently, client instance authentication or assurance established by <span>[<a href="#I-D.ietf-oauth-attestation-based-client-auth" class="cite xref">I-D.ietf-oauth-attestation-based-client-auth</a>]</span> does not replace the authorization processing defined by this document.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
@@ -1380,7 +1383,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-3-8">Native Application (Native App)<a href="#section-3-8" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
 <li class="normal ulEmpty" id="section-3-9.1">
-          <p id="section-3-9.1.1">An application that is installed by the user to their device. Different from the "native app" definition in <span><a href="https://rfc-editor.org/rfc/rfc8252#section-3" class="relref">Section 3</a> of [<a href="#RFC8252" class="cite xref">RFC8252</a>]</span>, Native Application is expected to provide device attributes and application metadata.<a href="#section-3-9.1.1" class="pilcrow">¶</a></p>
+          <p id="section-3-9.1.1">An application that is installed by the user on their device. Different from the "native app" definition in <span><a href="https://rfc-editor.org/rfc/rfc8252#section-3" class="relref">Section 3</a> of [<a href="#RFC8252" class="cite xref">RFC8252</a>]</span>, Native Application is expected to provide device attributes and application metadata.<a href="#section-3-9.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-3-10">Native Application Client<a href="#section-3-10" class="pilcrow">¶</a></p>
@@ -1404,7 +1407,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-3-16">Trust Assessment<a href="#section-3-16" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
 <li class="normal ulEmpty" id="section-3-17.1">
-          <p id="section-3-17.1.1">Evaluation of an Attestation Result according to an APR. APR <span class="bcp14">MAY</span> have separate rule for each Appraisal Assertion forming the Attestation Result.<a href="#section-3-17.1.1" class="pilcrow">¶</a></p>
+          <p id="section-3-17.1.1">Evaluation of an Attestation Result according to an APR. An APR <span class="bcp14">MAY</span> have separate rule for each Appraisal Assertion forming the Attestation Result.<a href="#section-3-17.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-3-18">Trust Decision<a href="#section-3-18" class="pilcrow">¶</a></p>
@@ -1455,7 +1458,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-5-4">This flow includes the following steps:<a href="#section-5-4" class="pilcrow">¶</a></p>
 <p id="section-5-5">(A) Native Application requests a Challenge value from Verifier. Native Application <span class="bcp14">MAY</span> sign the request by the generated key. If request is signed, Native Application <span class="bcp14">MUST</span> send the public key JWK to the Verifier. It's <span class="bcp14">RECOMMENDED</span> to use HTTP Message Signatures <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> for the signing implementation and HTTPS as the underlying protocol.<a href="#section-5-5" class="pilcrow">¶</a></p>
 <p id="section-5-6">(B) Verifier generates a fresh Challenge with sufficient entropy. If request is signed and Verifier receives public JWK from Native Application, it <span class="bcp14">MUST</span> bind the generated Challenge value to the public key JWK or to a stable identifier derived from that key, such as a JWK Thumbprint (<span>[<a href="#RFC7638" class="cite xref">RFC7638</a>]</span>). Verifier <span class="bcp14">MUST</span> store the Challenge creation timestamp for the freshness check. Verifier <span class="bcp14">MUST</span> make the response uncacheable by adding a <code>Cache-Control</code> header set as <code>no-store</code>.<a href="#section-5-6" class="pilcrow">¶</a></p>
-<p id="section-5-7">Native Application <span class="bcp14">MAY</span> contact with other parties when collecting the Evidence. In terms of RATS architecture, Evidence is created by Attesting Environments. The Attesting Environment can be a remote service provided by a vendor or platform. Message exchange is shown below.<a href="#section-5-7" class="pilcrow">¶</a></p>
+<p id="section-5-7">Native Application <span class="bcp14">MAY</span> contact other parties when collecting the Evidence. In terms of RATS architecture, Evidence is created by Attesting Environments. The Attesting Environment can be a remote service provided by a vendor or platform. Message exchange is shown below.<a href="#section-5-7" class="pilcrow">¶</a></p>
 <div class="alignLeft art-ascii-art art-text artwork" id="section-5-8">
 <pre>
 +---------------+               (A)   +---------------+
@@ -1530,7 +1533,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
           <p id="section-7-3.6.1">A timestamp value indicating when the Attestation Result expires.<a href="#section-7-3.6.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-7-4">The encoding of the Attestation Result is beyond the scope of this document. However implementer <span class="bcp14">MAY</span> choose EAR Tokens as defined in EAT Attestation Results <span>[<a href="#I-D.ietf-rats-ear" class="cite xref">I-D.ietf-rats-ear</a>]</span>.<a href="#section-7-4" class="pilcrow">¶</a></p>
+<p id="section-7-4">The encoding of the Attestation Result is beyond the scope of this document. However, the implementer <span class="bcp14">MAY</span> choose EAR Tokens as defined in EAT Attestation Results <span>[<a href="#I-D.ietf-rats-ear" class="cite xref">I-D.ietf-rats-ear</a>]</span>.<a href="#section-7-4" class="pilcrow">¶</a></p>
 <p id="section-7-5">When DPoP <span>[<a href="#RFC9449" class="cite xref">RFC9449</a>]</span> is used as the Proof of Possession mechanism, the Attestation Result <span class="bcp14">MUST</span> convey the Native Application public key as a JWK <span>[<a href="#RFC7517" class="cite xref">RFC7517</a>]</span>. When an EAR Token <span>[<a href="#I-D.ietf-rats-ear" class="cite xref">I-D.ietf-rats-ear</a>]</span> is used for the Attestation Result in such deployments, it <span class="bcp14">MUST</span> be encoded as a JWT. Profiles using another Proof of Possession mechanism <span class="bcp14">MAY</span> define an alternative representation of the Native Application public key.<a href="#section-7-5" class="pilcrow">¶</a></p>
 <p id="section-7-6">Verifier <span class="bcp14">MUST</span> use the Attestation Result format and encoding supported by the Authorization Server.<a href="#section-7-6" class="pilcrow">¶</a></p>
 </section>
@@ -1551,7 +1554,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
           <p id="section-8-4.2.1">Checks if the Native Application still possesses the key pair bound to the Attestation Result (as detailed in <a href="#archeck" class="auto internal xref">Section 8.1</a>).<a href="#section-8-4.2.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-8-4.3">
-          <p id="section-8-4.3.1">Checks the freshness of the Attestation Result using the creation timestamp (as detaild in <a href="#fcheck" class="auto internal xref">Section 8.2</a>).<a href="#section-8-4.3.1" class="pilcrow">¶</a></p>
+          <p id="section-8-4.3.1">Checks the freshness of the Attestation Result using the creation timestamp (as detailed in <a href="#fcheck" class="auto internal xref">Section 8.2</a>).<a href="#section-8-4.3.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-8-4.4">
           <p id="section-8-4.4.1">Checks if Verifier ID is present and is trusted by the system.<a href="#section-8-4.4.1" class="pilcrow">¶</a></p>
@@ -1586,7 +1589,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-attestation-result-freshnes" class="section-name selfRef">Attestation Result Freshness Check</a>
         </h3>
 <p id="section-8.2-1">Because clock skew can exist between the Verifier and Authorization Server, the Authorization Server <span class="bcp14">MAY</span> apply bounded clock-skew leeway when performing freshness validation. When such leeway is applied, the Authorization Server <span class="bcp14">MUST</span> use separate values for cases in which the Verifier's clock is ahead of or behind the Authorization Server's clock. The permitted offset when the Verifier's clock is ahead of the Authorization Server's clock <span class="bcp14">SHOULD</span> be kept as small as operationally practical because accepting future-dated Attestation Results can extend their effective freshness window.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
-<p id="section-8.2-2">The Authorization Server <span class="bcp14">SHOULD</span> maintain a securely synchronized clock. The detailed validation procedure, including application of freshness threshods and clock-skew leeway values, is specified in <a href="#appa" class="auto internal xref">Appendix A</a>.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
+<p id="section-8.2-2">The Authorization Server <span class="bcp14">SHOULD</span> maintain a securely synchronized clock. The detailed validation procedure, including application of freshness thresholds and clock-skew leeway values, is specified in <a href="#appa" class="auto internal xref">Appendix A</a>.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
 <p id="section-8.2-3">The freshness check establishes that the Attestation Result satisfies the Authorization Server's freshness policy at the time it is appraised. It does not establish that the Native Application remains in the attested state throughout the lifetime of an access token issued based on that result.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1615,7 +1618,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-9-4"><code>attestation_profile</code><a href="#section-9-4" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
 <li class="normal ulEmpty" id="section-9-5.1">
-          <p id="section-9-5.1.1"><span class="bcp14">OPTIONAL</span>. References to the Authorization Policy which will evaluate the Attestation Result. Implementer may choose to mark this parameter as <span class="bcp14">REQUIRED</span> when Authorization Server supports definition of multiple Authorization Policies.<a href="#section-9-5.1.1" class="pilcrow">¶</a></p>
+          <p id="section-9-5.1.1"><span class="bcp14">OPTIONAL</span>. References to the Authorization Policy which will evaluate the Attestation Result. The implementer <span class="bcp14">MAY</span> require this parameter when Authorization Server supports definition of multiple Authorization Policies.<a href="#section-9-5.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-9-6">The following example uses "\" line wrapping per <span>[<a href="#RFC8792" class="cite xref">RFC8792</a>]</span> to show a token request. The compact DPoP proof and Attestation Result values are abbreviated for readability.<a href="#section-9-6" class="pilcrow">¶</a></p>
@@ -1649,7 +1652,7 @@ POST /token HTTP/1.1
         <h3 id="name-attestation-result-precheck">
 <a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-attestation-result-precheck" class="section-name selfRef">Attestation Result Precheck</a>
         </h3>
-<p id="section-10.1-1">Authorization Server <span class="bcp14">MAY</span> precheck an Attestation Result during an early stage of the authorization flow in order to avoid unnecessary steps in case Attestation Result is invalid or doesn't meet requirements of target Trust Assesments. In this case, the parameters defined in <a href="#ext" class="auto internal xref">Section 9</a> can be used in the authorization request.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
+<p id="section-10.1-1">Authorization Server <span class="bcp14">MAY</span> precheck an Attestation Result during an early stage of the authorization flow in order to avoid unnecessary steps in case Attestation Result is invalid or doesn't meet requirements of target Trust Assessments. In this case, the parameters defined in <a href="#ext" class="auto internal xref">Section 9</a> can be used in the authorization request.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
 <p id="section-10.1-2">An Attestation Result could be conveyed through the front-channel authorization request. Because an Attestation Result can contain sensitive information, the Verifier would need to cryptographically encrypt it for the Authorization Server. Contents of the Attestation Result will remain hidden all the way through the Authorization Server, however, this option can lead to long URLs, which can be problematic due to size limitations that can be enforced from any intermediary hop.<a href="#section-10.1-2" class="pilcrow">¶</a></p>
 <p id="section-10.1-3">When DPoP is used, the <code>dpop_jkt</code> authorization request parameter defined in <span>[<a href="#RFC9449" class="cite xref">RFC9449</a>]</span> can identify the DPoP public key by its SHA-256 JWK Thumbprint (<span>[<a href="#RFC7638" class="cite xref">RFC7638</a>]</span>). The Authorization Server can compare this value with the public key bound to the Attestation Result. However, <code>dpop_jkt</code> does not by itself demonstrate possession of the corresponding private key and therefore is not sufficient to complete the Attestation Result Key-Binding Check defined in <a href="#archeck" class="auto internal xref">Section 8.1</a>.<a href="#section-10.1-3" class="pilcrow">¶</a></p>
 <p id="section-10.1-4">Consequently, a public client using DPoP that requests Attestation Result precheck <span class="bcp14">MUST</span> submit the Attestation Result using Pushed Authorization Requests <span>[<a href="#RFC9126" class="cite xref">RFC9126</a>]</span> and <span class="bcp14">MUST</span> include a DPoP proof in the pushed authorization request as described in <span><a href="https://rfc-editor.org/rfc/rfc9449#section-10.1" class="relref">Section 10.1</a> of [<a href="#RFC9449" class="cite xref">RFC9449</a>]</span>. The Authorization Server <span class="bcp14">MUST</span> validate the DPoP proof and <span class="bcp14">MUST</span> perform the Attestation Result Key-Binding Check defined in <a href="#archeck" class="auto internal xref">Section 8.1</a>. RFC 9449 further requires the subsequent token request to demonstrate possession of the same key.<a href="#section-10.1-4" class="pilcrow">¶</a></p>
@@ -1698,7 +1701,7 @@ POST /token HTTP/1.1
         <h3 id="name-communication-security">
 <a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-communication-security" class="section-name selfRef">Communication Security</a>
         </h3>
-<p id="section-11.1-1">This document does not enforce any particular protocol for the messaging between Attestation Server and a remote Verifier. However the implementer <span class="bcp14">MUST</span> use TLS for securing the underlying protocol.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
+<p id="section-11.1-1">This document does not enforce any particular protocol for the messaging between Attestation Server and a remote Verifier. However, the implementer <span class="bcp14">MUST</span> use TLS for securing the underlying protocol.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2042,8 +2045,36 @@ This checks that the Verifier's declared validity interval is less than the maxi
       </ol>
 </section>
 </div>
-<div id="authors-addresses">
+<div id="document-history">
 <section id="appendix-B">
+      <h2 id="name-document-history">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-document-history" class="section-name selfRef">Document History</a>
+      </h2>
+<p id="appendix-B-1">-01<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B-2.1">
+          <p id="appendix-B-2.1.1">Added Attestation Result temporal limitations to Security Considerations<a href="#appendix-B-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-2.2">
+          <p id="appendix-B-2.2.1">Added guidance on clock skew handling for freshness validation<a href="#appendix-B-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-2.3">
+          <p id="appendix-B-2.3.1">Added Attestation Result key binding<a href="#appendix-B-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-2.4">
+          <p id="appendix-B-2.4.1">Revised Related Work section<a href="#appendix-B-2.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="appendix-B-3">-00<a href="#appendix-B-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B-4.1">
+          <p id="appendix-B-4.1.1">Initial draft<a href="#appendix-B-4.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-C">
       <h2 id="name-authors-address">
 <a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
       </h2>
