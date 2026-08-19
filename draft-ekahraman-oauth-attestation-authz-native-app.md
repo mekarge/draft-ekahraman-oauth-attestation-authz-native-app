@@ -380,7 +380,7 @@ When an Attestation Result is received at the pushed authorization request endpo
 4. Checks if Verifier ID is present and is trusted by the system.
 5. Checks if the intended Authorization Server points to the server itself.
 6. Checks if Attestation Result contains all necessary Appraisal Assertions required by the Trust Assessments.
-7. Stores the Attestation Result for the Authorization Policy evaluation during the upcoming token request. Authorization Server SHOULD store the Attestation Result with an expiry time not longer than the combination of authorization code and request URI lifetimes.
+7. Stores the Attestation Result for the Authorization Policy evaluation during the upcoming token request. Authorization Server SHOULD store the Attestation Result with an expiry time not longer than the combination of authorization code and request URI lifetimes. Before using the stored Attestation Result for Authorization Policy evaluation, the Authorization Server MUST perform the decision-time freshness validation defined in [](#fcheck).
 
 If one of those steps fails, Authorization Server MUST respond with an error. The error SHOULD indicate `access_denied` as defined in {{Section 4.1.2.1 of RFC6749}}.
 
@@ -513,21 +513,21 @@ Following the event definitions in Appendix A of RFC 9334, let:
 
 * `RG_v`: the Attestation Result generation time, according to the Verifier's clock.
 * `RX_v`: the Attestation Result expiry time, according to the Verifier's clock.
-* `RA_r`: the time at which the Authorization Server appraises the Attestation Result, according to the Authorization Server's clock.
+* `OP_r`: the time at which the Authorization Server evaluates the Authorization Policy, according to the Authorization Server's clock.
 
 The Authorization Server then validates the Attestation Result using the following checks:
 
-1. `RG_v < RA_r + leeway_verifier_ahead`
+1. `RG_v < OP_r + leeway_verifier_ahead`
 
     This checks that the Attestation Result was not generated unreasonably far in the future from the Authorization Server's perspective.
 
     Because a future-dated `RG_v` also reduces the apparent age calculated by Check 2, `leeway_verifier_ahead` SHOULD be kept as small as operationally practical. Accepting an Attestation Result generated up to `leeway_verifier_ahead` in the future can extend its effective freshness window by the same amount.
 
-2. `RA_r - RG_v < freshness_threshold + leeway_verifier_behind`
+2. `OP_r - RG_v < freshness_threshold + leeway_verifier_behind`
 
     This verifies that the Attestation Result is recent enough to meet the Authorization Server's freshness policy.
 
-3. `RA_r < RX_v + leeway_verifier_behind`
+3. `OP_r < RX_v + leeway_verifier_behind`
 
     This checks that the Attestation Result has not expired according to the Verifier's declared validity interval.
 
