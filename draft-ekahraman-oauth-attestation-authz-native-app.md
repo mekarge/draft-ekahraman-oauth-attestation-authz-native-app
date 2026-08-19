@@ -318,6 +318,8 @@ Because clock skew can exist between the Verifier and Authorization Server, the 
 
 The Authorization Server SHOULD maintain a securely synchronized clock. The detailed validation procedure, including application of freshness threshods and clock-skew leeway values, is specified in [](#appa).
 
+The freshness check establishes that the Attestation Result satisfies the Authorization Server's freshness policy at the time it is appraised. It does not establish that the Native Application remains in the attested state throughout the lifetime of an access token issued based on that result.
+
 ## Refresh Tokens
 
 The Client MUST send an Attestation Result to the Authorization Server when using a refresh token grant according to the freshness window required by the Authorization Server. Because Attestation Results are snapshots of Native Application's runtime state at a single point in time, the Authorization Server MUST reject the request if Attestation Result is missing or stale.
@@ -448,6 +450,10 @@ As aforementioned, Authorization Server MUST check if Verifier ID is present and
 ## Device Key Extraction
 
 The security of this mechanism relies on the device's ability to prevent key extraction. It is therefore Verifier's responsibility to assess the risk accordingly if the device executing Native Application does not support a secure enclave or a similar hardware-based storage.
+
+## Attestation Result Temporal Limitations
+
+An Attestation Result represents a snapshot of the Native Application and its execution environment. The freshness checks defined in [](#fcheck) bound the age of that snapshot when the Authorization Server makes an authorization decision, but do not provide continuous assurance during subsequent use of the resulting access token. The state of the Native Application can change after token issuance, including becoming compromised while the access token remains valid. Deployments requiring a tighter bound on this risk can use shorter access token lifetimes, more frequent re-attestation, or other deployment-specific mechanisms.
 
 # Privacy Considerations
 
