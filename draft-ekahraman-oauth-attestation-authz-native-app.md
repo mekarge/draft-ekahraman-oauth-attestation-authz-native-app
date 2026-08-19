@@ -541,3 +541,16 @@ If the Authorization Server defines a maximum acceptable Attestation Result life
 
     This checks that the Verifier's declared validity interval is less than the maximum lifetime accepted by the Authorization Server.
 
+# Document History
+
+-01
+
+* Added Attestation Result temporal limitations to Security Considerations
+* Added guidance on clock skew handling for freshness validation
+* Added Attestation Result key binding
+* Revised Related Work section
+
+-00
+
+* Initial draft
+
