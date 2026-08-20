@@ -487,7 +487,7 @@ This specification requests registration of the following values in the IANA "OA
 
 * Parameter Usage Location: authorization request, token request
 
-* Reference: Section 8 of this document
+* Reference: [](#ext) of this document
 
 >
 
@@ -495,7 +495,7 @@ This specification requests registration of the following values in the IANA "OA
 
 * Parameter Usage Location: authorization request, token request
 
-* Reference: Section 8 of this document
+* Reference: [](#ext) of this document
 
 --- back
 
@@ -521,7 +521,7 @@ The Authorization Server then validates the Attestation Result using the followi
 
     This checks that the Attestation Result was not generated unreasonably far in the future from the Authorization Server's perspective.
 
-    Because a future-dated `RG_v` also reduces the apparent age calculated by Check 2, `leeway_verifier_ahead` SHOULD be kept as small as operationally practical. Accepting an Attestation Result generated up to `leeway_verifier_ahead` in the future can extend its effective freshness window by the same amount.
+    Because a future-dated `RG_v` also reduces the apparent age calculated by Check 2, `leeway_verifier_ahead` SHOULD be kept small relative to `freshness_threshold` as operationally practical. Accepting an Attestation Result generated up to `leeway_verifier_ahead` in the future can extend its effective freshness window by the same amount.
 
 2. `OP_r - RG_v < freshness_threshold + leeway_verifier_behind`
 
