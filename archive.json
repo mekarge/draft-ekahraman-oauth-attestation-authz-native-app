@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-18T00:32:30.159618+00:00",
+  "timestamp": "2026-08-20T00:32:37.196872+00:00",
   "repo": "mekarge/draft-ekahraman-oauth-attestation-authz-native-app",
   "labels": [
     {
@@ -55,7 +55,7 @@
       "id": "I_kwDOS1WQVc8AAAABFao9dQ",
       "title": "Revise \"Related Works\"",
       "url": "https://github.com/mekarge/draft-ekahraman-oauth-attestation-authz-native-app/issues/1",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mekarge",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -64,8 +64,8 @@
       "labels": [],
       "body": "* Add more details to better articulate the distinction with https://drafts.oauth.net/draft-ietf-oauth-attestation-based-client-auth/draft-ietf-oauth-attestation-based-client-auth.html",
       "createdAt": "2026-06-14T08:30:23Z",
-      "updatedAt": "2026-06-14T08:30:36Z",
-      "closedAt": null,
+      "updatedAt": "2026-08-19T16:29:56Z",
+      "closedAt": "2026-08-19T16:29:56Z",
       "comments": []
     },
     {
@@ -73,7 +73,7 @@
       "id": "I_kwDOS1WQVc8AAAABGjGSfQ",
       "title": "Attestation Result key binding",
       "url": "https://github.com/mekarge/draft-ekahraman-oauth-attestation-authz-native-app/issues/2",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mekarge",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -82,8 +82,8 @@
       "labels": [],
       "body": "Particularly for public clients, relying on freshness alone is not sufficient to address substitution or replay of an exfiltrated Attestation Result.",
       "createdAt": "2026-06-24T11:36:09Z",
-      "updatedAt": "2026-06-24T11:36:09Z",
-      "closedAt": null,
+      "updatedAt": "2026-08-19T16:34:36Z",
+      "closedAt": "2026-08-19T16:34:36Z",
       "comments": []
     },
     {
@@ -91,7 +91,7 @@
       "id": "I_kwDOS1WQVc8AAAABGjGs5g",
       "title": "Concrete guidance on skew handling for freshness validation",
       "url": "https://github.com/mekarge/draft-ekahraman-oauth-attestation-authz-native-app/issues/3",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mekarge",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -100,8 +100,8 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-06-24T11:37:07Z",
-      "updatedAt": "2026-06-24T11:37:07Z",
-      "closedAt": null,
+      "updatedAt": "2026-08-19T16:44:04Z",
+      "closedAt": "2026-08-19T16:44:04Z",
       "comments": []
     },
     {
@@ -109,7 +109,7 @@
       "id": "I_kwDOS1WQVc8AAAABGjHM9A",
       "title": "Emphasize the snapshot nature of the Attestation Result",
       "url": "https://github.com/mekarge/draft-ekahraman-oauth-attestation-authz-native-app/issues/4",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mekarge",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -118,10 +118,55 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-06-24T11:38:17Z",
-      "updatedAt": "2026-06-24T11:38:17Z",
+      "updatedAt": "2026-08-19T16:43:52Z",
+      "closedAt": "2026-08-19T16:43:52Z",
+      "comments": []
+    },
+    {
+      "number": 5,
+      "id": "I_kwDOS1WQVc8AAAABNXRVgg",
+      "title": "Publish draft version 01",
+      "url": "https://github.com/mekarge/draft-ekahraman-oauth-attestation-authz-native-app/issues/5",
+      "state": "OPEN",
+      "author": "mekarge",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "0x0efe"
+      ],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-08-19T10:48:51Z",
+      "updatedAt": "2026-08-19T10:48:51Z",
       "closedAt": null,
       "comments": []
     }
   ],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 6,
+      "id": "PR_kwDOS1WQVc8AAAABAUDH4A",
+      "title": "Changes for the next draft",
+      "url": "https://github.com/mekarge/draft-ekahraman-oauth-attestation-authz-native-app/pull/6",
+      "state": "OPEN",
+      "author": "0x0efe",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-08-19T17:16:21Z",
+      "updatedAt": "2026-08-19T17:16:21Z",
+      "baseRepository": "mekarge/draft-ekahraman-oauth-attestation-authz-native-app",
+      "baseRefName": "main",
+      "baseRefOid": "fe6a2b78a4c250b6e1152e68b1002f3d0967f3b4",
+      "headRepository": "mekarge/draft-ekahraman-oauth-attestation-authz-native-app",
+      "headRefName": "01",
+      "headRefOid": "9e9d68271c4bfd65e0535cb17223c711ffa1e388",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    }
+  ]
 }
