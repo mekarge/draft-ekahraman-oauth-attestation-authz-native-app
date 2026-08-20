@@ -4,8 +4,8 @@
 
 Web Authorization Protocol                                   E. Kahraman
 Internet-Draft                                                   Mekarge
-Intended status: Informational                            19 August 2026
-Expires: 20 February 2027
+Intended status: Informational                            20 August 2026
+Expires: 21 February 2027
 
 
    OAuth 2.0 Attestation Based Authorization for Native Applications
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 February 2027.
+   This Internet-Draft will expire on 21 February 2027.
 
 Copyright Notice
 
@@ -999,14 +999,14 @@ Table of Contents
 
    *  Parameter Usage Location: authorization request, token request
 
-   *  Reference: Section 8 of this document
+   *  Reference: Section 9 of this document
 
 
    *  Name: attestation_profile
 
    *  Parameter Usage Location: authorization request, token request
 
-   *  Reference: Section 8 of this document
+   *  Reference: Section 9 of this document
 
 17.  References
 
@@ -1150,10 +1150,11 @@ Appendix A.  Detailed Attestation Result Time Validation
        perspective.
 
        Because a future-dated RG_v also reduces the apparent age
-       calculated by Check 2, leeway_verifier_ahead SHOULD be kept as
-       small as operationally practical.  Accepting an Attestation
-       Result generated up to leeway_verifier_ahead in the future can
-       extend its effective freshness window by the same amount.
+       calculated by Check 2, leeway_verifier_ahead SHOULD be kept small
+       relative to freshness_threshold as operationally practical.
+       Accepting an Attestation Result generated up to
+       leeway_verifier_ahead in the future can extend its effective
+       freshness window by the same amount.
 
    2.  OP_r - RG_v < freshness_threshold + leeway_verifier_behind
 
